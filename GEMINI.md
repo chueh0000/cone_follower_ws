@@ -24,7 +24,12 @@ This project focuses on implementing an autonomous navigation stack for an elect
 ### 4. Vehicle Interface Module (`src/cone_follower_vehicle_interface`)
 - **Proprietary Interface:** Subscribes to steering and speed commands and passes them to the vehicle's proprietary control package.
 
-### 5. Custom Messages (`src/cone_follower_msgs`)
+### 5. Simulation & Validation (`FSDS`)
+- **Formula Student Driverless Simulator (FSDS):** Unreal Engine-based simulator for closed-loop testing.
+- **ROS 2 Bridge:** Facilitates communication between the autonomous stack and the simulator.
+- **AirLib Physics:** Provides realistic vehicle dynamics for control law validation.
+
+### 6. Custom Messages (`src/cone_follower_msgs`)
 - Centralized definitions for perception and control data structures to ensure consistency across nodes.
 
 ---
@@ -32,17 +37,16 @@ This project focuses on implementing an autonomous navigation stack for an elect
 ## Development & Deployment Lifecycle
 
 ### Environment Strategy
-- **Mac / Remote Workstation:** Primary development for Phases 1 and 2. Uses mock data and recorded ZED `.svo` files.
+- **Mac / Remote Workstation:** Primary development for Phases 1 and 2. Uses FSDS, mock data, and recorded ZED `.svo` files.
 - **Vehicle Laptop:** Final deployment and Phase 3. ROS 2 on Ubuntu with direct sensor access.
 
 ### Phased Workflow
-1.  **Phase 1 (Weeks 1-3): Logic & Simulation.** Work with mock 3D points in RViz 2.
-2.  **Phase 2 (Weeks 4-5): Perception Integration.** Transition from mock points to ZED `.svo` playback with YOLO.
+1.  **Phase 1 (Weeks 1-3): Logic & Simulation.** Work with mock 3D points in RViz 2 and FSDS.
+2.  **Phase 2 (Weeks 4-5): Perception Integration.** Transition from mock points to FSDS virtual cameras and ZED `.svo` playback with YOLO.
 3.  **Phase 3 (Weeks 6-7): Field Deployment.** Hardware handshake and real-world track testing.
 
 ---
 
 ## Development Conventions
-- **Tooling:** Use `just` for command automation and `direnv` for automatic ROS 2 environment sourcing. The `just build` recipe is configured to automatically trigger a `direnv` reload, ensuring the environment is always in sync with the latest build without manual sourcing.
-- **Modularization:** Maintain strict separation between perception, planning, and control modules to allow for easier debugging and component swapping.
-- **Simulation First:** Verify all algorithmic changes using the kinematic bicycle model and RViz 2 before testing on hardware.
+- **Tooling:** Use `just` for command automation and `direnv` for automatic ROS 2 environment sourcing. Use `just setup` to manage dependencies via `vcs`.
+- **Simulation First:** Verify all algorithmic changes using FSDS before testing on hardware.
