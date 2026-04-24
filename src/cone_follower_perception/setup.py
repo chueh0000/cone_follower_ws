@@ -1,5 +1,5 @@
 from setuptools import find_packages, setup
-package_name = 'perception'
+package_name = 'cone_follower_perception'
 setup(
     name=package_name,
     version='0.0.0',

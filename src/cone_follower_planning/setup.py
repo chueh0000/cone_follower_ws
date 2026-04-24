@@ -1,5 +1,5 @@
 from setuptools import find_packages, setup
-package_name = 'vehicle_interface'
+package_name = 'cone_follower_planning'
 setup(
     name=package_name,
     version='0.0.0',
@@ -12,7 +12,7 @@ setup(
     zip_safe=True,
     maintainer='howardchueh',
     maintainer_email='howardchueh@todo.todo',
-    description='Vehicle interface package for low-level control communication.',
+    description='Path planning package for centerline generation.',
     license='TODO: License declaration',
     tests_require=['pytest'],
     entry_points={'console_scripts': []},

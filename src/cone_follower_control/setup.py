@@ -1,5 +1,5 @@
 from setuptools import find_packages, setup
-package_name = 'planning'
+package_name = 'cone_follower_control'
 setup(
     name=package_name,
     version='0.0.0',
@@ -12,7 +12,7 @@ setup(
     zip_safe=True,
     maintainer='howardchueh',
     maintainer_email='howardchueh@todo.todo',
-    description='Path planning package for centerline generation.',
+    description='Control package for steering and speed command generation.',
     license='TODO: License declaration',
     tests_require=['pytest'],
     entry_points={'console_scripts': []},

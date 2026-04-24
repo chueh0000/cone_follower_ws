@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>perception</name>
+  <name>cone_follower_planning</name>
   <version>0.0.0</version>
-  <description>Perception package for cone detection and localization.</description>
+  <description>Path planning package for centerline generation.</description>
   <maintainer email="howardchueh@todo.todo">howardchueh</maintainer>
   <license>TODO: License declaration</license>
   <depend>rclpy</depend>

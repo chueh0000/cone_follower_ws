@@ -8,20 +8,20 @@ This project focuses on implementing an autonomous navigation stack for an elect
 
 ## Technical Stack & Architecture
 
-### 1. Perception Module (`src/perception`)
+### 1. Perception Module (`src/cone_follower_perception`)
 - **YOLO Detector:** Trained on FSOCO v2 dataset. Generates 2D bounding boxes of cones.
 - **ZED Custom Object Detection API:** Takes 2D BBoxes and bridges them into 3D $(X, Y, Z)$ coordinates using spatial information.
 - **Data Input:** Supports live ZED 2i camera feed and ZED `.svo` file playback (for offline testing).
 
-### 2. Planning Module (`src/planning`)
+### 2. Planning Module (`src/cone_follower_planning`)
 - **Delaunay Triangulation:** Connects 3D cone points to map the track boundaries.
 - **Centerline Generation:** Filters edges and calculates midpoints to create a continuous trajectory (smoothed via B-splines or moving averages).
 
-### 3. Control Module (`src/control`)
+### 3. Control Module (`src/cone_follower_control`)
 - **Adaptive Pure Pursuit:** Calculates steering and speed commands based on an adaptive lookahead distance.
 - **Kinematic Mapping:** Converts target vehicle steering angle to the specific electric SUV's steering wheel angle and speed.
 
-### 4. Vehicle Interface Module (`src/vehicle_interface`)
+### 4. Vehicle Interface Module (`src/cone_follower_vehicle_interface`)
 - **Proprietary Interface:** Subscribes to steering and speed commands and passes them to the vehicle's proprietary control package.
 
 ### 5. Custom Messages (`src/cone_follower_msgs`)
@@ -43,6 +43,6 @@ This project focuses on implementing an autonomous navigation stack for an elect
 ---
 
 ## Development Conventions
-- **Tooling:** Use `just` for command automation and `direnv` for automatic ROS 2 environment sourcing.
+- **Tooling:** Use `just` for command automation and `direnv` for automatic ROS 2 environment sourcing. The `just build` recipe is configured to automatically trigger a `direnv` reload, ensuring the environment is always in sync with the latest build without manual sourcing.
 - **Modularization:** Maintain strict separation between perception, planning, and control modules to allow for easier debugging and component swapping.
 - **Simulation First:** Verify all algorithmic changes using the kinematic bicycle model and RViz 2 before testing on hardware.

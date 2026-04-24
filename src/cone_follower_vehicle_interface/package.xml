@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>vehicle_interface</name>
+  <name>cone_follower_vehicle_interface</name>
   <version>0.0.0</version>
   <description>Vehicle interface package for low-level control communication.</description>
   <maintainer email="howardchueh@todo.todo">howardchueh</maintainer>

@@ -1,3 +1,63 @@
-.DS_Store
+# ROS 2 Build Artifacts
+build/
+install/
+log/
+COLCON_IGNORE
 
-data/*
+# ZED Camera & ROS Bags
+*.svo
+*.svo2
+*.bag
+*.db3
+*.yaml.ros2
+
+# YOLO / ML Weights
+*.pt
+*.pth
+*.onnx
+*.engine
+*.trt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+.venv/
+env/
+.env/
+
+# IDEs / Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS Generated
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

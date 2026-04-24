@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'simulation'
+package_name = 'cone_follower_simulation'
 
 setup(
     name=package_name,
@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'mock_track_publisher = simulation.mock_track_publisher:main'
+            'mock_track_publisher = cone_follower_simulation.mock_track_publisher:main'
         ],
     },
 )
