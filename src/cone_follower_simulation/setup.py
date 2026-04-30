@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'mock_track_publisher = cone_follower_simulation.mock_track_publisher:main'
+            'mock_track_publisher = cone_follower_simulation.mock_track_publisher:main',
+            'cone_visualization_node = cone_follower_simulation.cone_visualization_node:main'
         ],
     },
 )

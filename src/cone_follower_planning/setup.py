@@ -15,5 +15,9 @@ setup(
     description='Path planning package for centerline generation.',
     license='TODO: License declaration',
     tests_require=['pytest'],
-    entry_points={'console_scripts': []},
+    entry_points={
+        'console_scripts': [
+            'centerline_generator_node = cone_follower_planning.centerline_generator_node:main'
+        ],
+    },
 )

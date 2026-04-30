@@ -27,3 +27,12 @@ test:
 
 source:
     @echo "Run 'source install/setup.bash' to source the local workspace."
+
+run-simulation:
+    bash -c "source install/setup.bash && ros2 run cone_follower_simulation mock_track_publisher"
+
+run-planning:
+    bash -c "source install/setup.bash && ros2 run cone_follower_planning centerline_generator_node"
+
+run-viz:
+    bash -c "source install/setup.bash && ros2 run cone_follower_simulation cone_visualization_node"
