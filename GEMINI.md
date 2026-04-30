@@ -48,5 +48,5 @@ This project focuses on implementing an autonomous navigation stack for an elect
 ---
 
 ## Development Conventions
-- **Tooling:** Use `just` for command automation and `direnv` for automatic ROS 2 environment sourcing. Use `just setup` to manage dependencies via `vcs`.
+- **Tooling:** Use `just` for command automation and `direnv` for automatic ROS 2 environment sourcing. Use `just setup` to manage dependencies (shallow clones with submodules, Eigen symlinking, and build optimizations).
 - **Simulation First:** Verify all algorithmic changes using FSDS before testing on hardware.

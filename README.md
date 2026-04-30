@@ -46,11 +46,24 @@ Use the provided `justfile` and `direnv` (.envrc) to manage the ROS 2 environmen
 2. **Download Simulator:** Run `just download-fsds` to fetch the pre-compiled FSDS binary (Linux).
 3. **Build:** Run `just build` to compile the workspace, including the `fsds_ros2_bridge`.
 
-  - Migrate to the vehicle laptop and connect the `vehicle_interface_node` to the proprietary control package.
-- **Week 7: Field Testing & Tuning**
-  - Perform real-world track testing, latency profiling, and parameter refinement.
+### Running the Mock Simulation (Week 1 Verification)
+To verify the path planning and visualization logic, run the following commands in separate terminals:
+
+1. **Terminal 1 (Mock Track):** `just run-simulation`
+2. **Terminal 2 (Path Planning):** `just run-planning`
+3. **Terminal 3 (RViz Visualization):** `just run-viz`
+4. **Terminal 4 (Launch RViz):** `rviz2`
+
+**In RViz 2:**
+- Set **Fixed Frame** to `map`.
+- Add **MarkerArray** display with topic `/cone_markers`.
+- Add **Path** display with topic `/centerline`.
 
 ---
 
-## Development Workflow
-Use the provided `justfile` and `direnv` (.envrc) to manage the ROS 2 environment and build processes across different machines.
+### Phase 3: Hardware Handshake & Field Testing (Weeks 6-7)
+*Goal: Deploy to the vehicle and optimize.*
+- **Week 6: Deployment & Actuation**
+  - Migrate to the vehicle laptop and connect the `vehicle_interface_node` to the proprietary control package.
+- **Week 7: Field Testing & Tuning**
+  - Perform real-world track testing, latency profiling, and parameter refinement.
