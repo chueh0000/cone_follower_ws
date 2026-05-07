@@ -15,5 +15,9 @@ setup(
     description='Control package for steering and speed command generation.',
     license='TODO: License declaration',
     tests_require=['pytest'],
-    entry_points={'console_scripts': []},
+    entry_points={
+        'console_scripts': [
+            'pure_pursuit_node = cone_follower_control.pure_pursuit_node:main'
+        ],
+    },
 )

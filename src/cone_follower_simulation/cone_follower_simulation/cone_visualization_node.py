@@ -1,5 +1,6 @@
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import QoSProfile, DurabilityPolicy
 from cone_follower_msgs.msg import ConeArray
 from visualization_msgs.msg import Marker, MarkerArray
 
@@ -7,16 +8,26 @@ class ConeVisualizationNode(Node):
     def __init__(self):
         super().__init__('cone_visualization_node')
         
+        # QoS Profile: Must match the publisher (Transient Local)
+        qos_profile = QoSProfile(
+            depth=1,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL
+        )
+        
         # Subscriber
         self.cone_sub = self.create_subscription(
             ConeArray,
             '/cones',
             self.cone_callback,
-            10
+            qos_profile
         )
         
         # Publisher
-        self.marker_pub = self.create_publisher(MarkerArray, '/cone_markers', 10)
+        self.marker_pub = self.create_publisher(
+            MarkerArray, 
+            '/cone_markers', 
+            qos_profile
+        )
         
         self.get_logger().info('Cone Visualization Node has been started.')
 
@@ -25,7 +36,7 @@ class ConeVisualizationNode(Node):
         
         for i, cone in enumerate(msg.cones):
             marker = Marker()
-            marker.header.frame_id = 'map'
+            marker.header.frame_id = 'fsds/map'
             marker.header.stamp = self.get_clock().now().to_msg()
             marker.ns = 'cones'
             marker.id = i
@@ -36,6 +47,12 @@ class ConeVisualizationNode(Node):
             marker.pose.position.x = cone.x
             marker.pose.position.y = cone.y
             marker.pose.position.z = 0.25 # Center of cylinder height
+            
+            # Orientation (Identity)
+            marker.pose.orientation.x = 0.0
+            marker.pose.orientation.y = 0.0
+            marker.pose.orientation.z = 0.0
+            marker.pose.orientation.w = 1.0
             
             # Scale (standard FS cone is ~0.3m wide, 0.5m high)
             marker.scale.x = 0.3

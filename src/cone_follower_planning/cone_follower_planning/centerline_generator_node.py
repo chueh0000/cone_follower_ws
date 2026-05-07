@@ -1,5 +1,6 @@
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import QoSProfile, DurabilityPolicy
 import numpy as np
 from scipy.spatial import Delaunay
 from cone_follower_msgs.msg import ConeArray, Cone
@@ -10,20 +11,31 @@ class CenterlineGeneratorNode(Node):
     def __init__(self):
         super().__init__('centerline_generator_node')
         
+        # QoS Profile: Must match the publisher (Transient Local)
+        qos_profile = QoSProfile(
+            depth=1,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL
+        )
+        
         # Subscribers
         self.cone_sub = self.create_subscription(
             ConeArray,
             '/cones',
             self.cone_callback,
-            10
+            qos_profile
         )
         
         # Publishers
-        self.path_pub = self.create_publisher(Path, '/centerline', 10)
+        self.path_pub = self.create_publisher(
+            Path, 
+            '/centerline', 
+            qos_profile
+        )
         
         self.get_logger().info('Centerline Generator Node has been started.')
 
     def cone_callback(self, msg: ConeArray):
+        self.get_logger().info(f'PLANNING: Received {len(msg.cones)} cones.')
         if len(msg.cones) < 3:
             return
 
@@ -65,9 +77,11 @@ class CenterlineGeneratorNode(Node):
                 
                 # Filter: edge length (avoid too long connections)
                 dist = np.linalg.norm(p1 - p2)
-                if 2.0 <= dist <= 10.0:  # Adjust thresholds as needed
+                if 1.0 <= dist <= 15.0:  # Broader range for TrainingMap
                     midpoint = (p1 + p2) / 2.0
                     midpoints.append(midpoint)
+        
+        self.get_logger().info(f'PLANNING: Found {len(midpoints)} valid midpoints.')
         
         if not midpoints:
             return
@@ -89,7 +103,7 @@ class CenterlineGeneratorNode(Node):
         # Publish Path
         path_msg = Path()
         path_msg.header.stamp = self.get_clock().now().to_msg()
-        path_msg.header.frame_id = 'map'
+        path_msg.header.frame_id = 'fsds/map'
         
         for mp in sorted_midpoints:
             pose = PoseStamped()

@@ -21,13 +21,13 @@ The goal is to enable an electric SUV to navigate through a course defined by co
 
 ## 7-Week Development Roadmap
 
-### Phase 1: Logic & Simulation (Weeks 1-3)
+### Phase 1: Logic & Simulation (Weeks 1-3) - [COMPLETED]
 *Goal: Build the "Perfect World" logic in software.*
-- **Week 1: Mock Data & Path Planning**
+- **[x] Week 1: Mock Data & Path Planning**
   - Implement Delaunay Triangulation to generate track centerlines from synthetic 3D points.
-- **Week 2: Control System & Kinematics**
-  - Implement Adaptive Pure Pursuit and map vehicle steering to steering wheel angles.
-- **Week 3: ROS 2 Architecture & Visualization**
+- **[x] Week 2: Control System & Kinematics**
+  - Implement Adaptive Pure Pursuit and map vehicle steering to steering wheel angles. *(Note: Implementation complete; fine-tuning in progress)*
+- **[x] Week 3: ROS 2 Architecture & Visualization**
   - Integrate nodes with FSDS and RViz 2 to verify control and planning in a closed-loop simulation.
 
 ### Phase 2: Perception & Reality (Weeks 4-5)
@@ -46,18 +46,25 @@ Use the provided `justfile` and `direnv` (.envrc) to manage the ROS 2 environmen
 2. **Download Simulator:** Run `just download-fsds` to fetch the pre-compiled FSDS binary (Linux).
 3. **Build:** Run `just build` to compile the workspace, including the `fsds_ros2_bridge`.
 
-### Running the Mock Simulation (Week 1 Verification)
-To verify the path planning and visualization logic, run the following commands in separate terminals:
+### Running the Simulation
+To run the full autonomous stack in simulation (FSDS):
 
-1. **Terminal 1 (Mock Track):** `just run-simulation`
-2. **Terminal 2 (Path Planning):** `just run-planning`
-3. **Terminal 3 (RViz Visualization):** `just run-viz`
-4. **Terminal 4 (Launch RViz):** `rviz2`
+1. **Terminal 1 (FSDS):** `just run-fsds TrainingMap` (or `SmallTrack`, `Skidpad`)
+2. **Terminal 2 (Stack):** `just launch-sim`
+
+The `just launch-sim` command handles the ROS bridge, track bridge, planning, control, and visualization nodes, and automatically opens RViz 2 with the correct configuration.
 
 **In RViz 2:**
-- Set **Fixed Frame** to `map`.
-- Add **MarkerArray** display with topic `/cone_markers`.
-- Add **Path** display with topic `/centerline`.
+- The configuration is pre-loaded. You should see the `/cone_markers` (MarkerArray) and `/centerline` (Path) once the simulation is running.
+- **Fixed Frame:** `map` (or `world`).
+
+---
+
+### Legacy/Individual Node Execution
+If you need to verify specific components or run the mock track (no FSDS required):
+
+- **Mock Track (Standalone):** `just run-simulation`
+- **Individual Nodes:** See `justfile` for `run-planning`, `run-control`, `run-viz`, etc.
 
 ---
 
