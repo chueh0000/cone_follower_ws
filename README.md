@@ -56,7 +56,7 @@ The `just launch-sim` command handles the ROS bridge, track bridge, planning, co
 
 **In RViz 2:**
 - The configuration is pre-loaded. You should see the `/cone_markers` (MarkerArray) and `/centerline` (Path) once the simulation is running.
-- **Fixed Frame:** `map` (or `world`).
+- **Fixed Frame:** `world` (or `fsds/map`).
 
 ---
 
