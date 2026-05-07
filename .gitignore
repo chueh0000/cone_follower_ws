@@ -54,7 +54,6 @@ env/
 *.swo
 
 # External Tools & Simulators
-tools/
 src/fsds_simulator/
 
 # OS Generated
