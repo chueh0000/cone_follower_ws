@@ -1,0 +1,9 @@
+# Ignore everything inside this directory
+*
+
+# Except settings.json
+!settings.json
+
+# Except this file itself
+!.gitignore
+
