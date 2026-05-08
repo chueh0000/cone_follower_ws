@@ -6,6 +6,40 @@ This project implements an autonomous cone-following system for an electric SUV 
 
 The goal is to enable an electric SUV to navigate through a course defined by cones. The system detects cones in 3D space, generates a optimal centerline path, and calculates the necessary steering and speed commands to follow that path.
 
+### System Architecture
+
+```mermaid
+graph LR
+    subgraph Inputs ["Perception Inputs"]
+        direction TB
+        subgraph Simulation ["Simulator Data"]
+            SimMap["Ground Truth Map<br/>(fsds_track_bridge)"]
+            SimCam["Virtual Camera<br/>(FSDS Virtual Cam)"]
+        end
+        ZED_Camera["ZED 2i Camera<br/>(Live Feed / SVO)"]
+    end
+
+    Perception["<b>Perception Node</b><br/>(YOLO + 3D Localization)"]
+    Planning["<b>Planning Node</b><br/>(Delaunay + Centerline)"]
+    Control["<b>Control Node</b><br/>(Pure Pursuit + Kinematics)"]
+
+    subgraph Outputs ["Control Outputs"]
+        direction TB
+        Drive_Sim["FSDS Simulator<br/>(Throttle, Brake, Steering Angle)"]
+        FoxtronPi["SUV Interface<br/>(Speed, Steering Wheel Angle)"]
+    end
+
+    SimMap --> Perception
+    SimCam --> Perception
+    ZED_Camera --> Perception
+
+    Perception -- "ConeArray" --> Planning
+    Planning -- "Path" --> Control
+
+    Control --> Drive_Sim
+    Control --> FoxtronPi
+```
+
 ### Hardware & Deployment
 - **Development Environment:** Mac or Remote Ubuntu Workstation with GPU (no sensor attached).
 - **Deployment Platform:** Ubuntu Laptop + ROS 2 + GPU (mounted on the vehicle).
