@@ -3,14 +3,18 @@ default:
 
 setup:
     # Clone FSDS with submodules, skipping heavy LFS assets
-    GIT_LFS_SKIP_SMUDGE=1 git clone --depth 1 --recurse-submodules https://github.com/FS-Driverless/Formula-Student-Driverless-Simulator.git src/fsds_simulator
+    if [ ! -d "src/fsds_simulator" ]; then \
+        GIT_LFS_SKIP_SMUDGE=1 git clone --depth 1 --recurse-submodules https://github.com/FS-Driverless/Formula-Student-Driverless-Simulator.git src/fsds_simulator; \
+    fi
     # Ignore non-ROS/heavy directories to speed up colcon build
     touch src/fsds_simulator/ros/COLCON_IGNORE
     touch src/fsds_simulator/AirSim/COLCON_IGNORE
-    touch src/fsds_simulator/rpc/COLCON_IGNORE
+    touch src/fsds_simulator/python/COLCON_IGNORE
+    touch src/fsds_simulator/simulator/COLCON_IGNORE
+    touch src/fsds_simulator/UE4Project/COLCON_IGNORE
     # Setup Eigen dependency for AirLib
     mkdir -p src/fsds_simulator/AirSim/AirLib/deps
-    ln -s /usr/include/eigen3 src/fsds_simulator/AirSim/AirLib/deps/eigen3
+    ln -sf /usr/include/eigen3 src/fsds_simulator/AirSim/AirLib/deps/eigen3
 
 download-fsds:
     mkdir -p tools
