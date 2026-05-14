@@ -74,9 +74,9 @@ graph LR
 ---
 
 ## Development Workflow
-Use the provided `justfile` and `direnv` (.envrc) to manage the ROS 2 environment and build processes.
+Use the provided `justfile` and `direnv` (.envrc) to manage the ROS 2 environment and build processes. (Install `justfile` and `direnv` first)
 
-1. **Setup Workspace:** Run `just setup` to clone the FSDS repository and configure dependencies (e.g., Eigen, COLCON_IGNORE).
+1. **Setup Workspace:** Run `just setup` to clone the FSDS repository, configure dependencies (e.g., Eigen, COLCON_IGNORE), and symlink the `settings.json` to `~/Documents/AirSim`.
 2. **Download Simulator:** Run `just download-fsds` to fetch the pre-compiled FSDS binary (Linux).
 3. **Build:** Run `just build` to compile the workspace, including the `fsds_ros2_bridge`.
 
@@ -84,15 +84,24 @@ Use the provided `justfile` and `direnv` (.envrc) to manage the ROS 2 environmen
 To run the full autonomous stack in simulation (FSDS):
 
 1. **Terminal 1 (FSDS):** `just run-fsds TrainingMap` (or `SmallTrack`, `Skidpad`)
-2. **Terminal 2 (Stack):** `just launch-sim`
+2. **Terminal 2 (Stack):** `just launch-sim [viz]`
 
-The `just launch-sim` command handles the ROS bridge, track bridge, planning, control, and visualization nodes, and automatically opens RViz 2 with the correct configuration.
+The `just launch-sim` command handles the ROS bridge, track bridge, planning, control, and visualization nodes.
+
+**Visualization Options:**
+- `just launch-sim true` (default): Opens RViz with a camera-focused view including Cam1 (color) and Depth Camera (scaled 0-20m).
+- `just launch-sim false`: Opens RViz with the standard track visualization (cones and centerline).
 
 **In RViz 2:**
-- The configuration is pre-loaded. You should see the `/cone_markers` (MarkerArray) and `/centerline` (Path) once the simulation is running.
-- **Fixed Frame:** `world` (or `fsds/map`).
+- The configuration is automatically loaded based on your `viz` choice.
+- **Depth Visualization:** The depth camera image is pre-scaled in the `cameras.rviz` config. If viewing manually, ensure **Normalize Range** is off and set the range to 0.0 - 20.0 for best contrast.
 
 ---
+
+### Camera Configuration
+The system is configured with a depth camera for perception testing. The `settings.json` (found in `tools/FSDS/`) includes:
+- `cam1`: Standard RGB camera.
+- `depth_cam`: Depth camera (ImageType 2) mounted centrally for spatial mapping.
 
 ### Legacy/Individual Node Execution
 If you need to verify specific components or run the mock track (no FSDS required):

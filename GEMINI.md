@@ -48,5 +48,10 @@ This project focuses on implementing an autonomous navigation stack for an elect
 ---
 
 ## Development Conventions
-- **Tooling:** Use `just` for command automation and `direnv` for automatic ROS 2 environment sourcing. Use `just setup` to manage dependencies (shallow clones with submodules, Eigen symlinking, and build optimizations).
+- **Tooling:** Use `just` for command automation and `direnv` for automatic ROS 2 environment sourcing. 
+- **Setup:** `just setup` performs a robust initialization:
+    - Shallow clones FSDS with submodules.
+    - Symlinks project `settings.json` to `~/Documents/AirSim/settings.json` to keep simulator and ROS bridge in sync.
+    - Configures Eigen and build optimizations (`COLCON_IGNORE`).
 - **Simulation First:** Verify all algorithmic changes using FSDS before testing on hardware.
+- **Sensor Configuration:** The simulator is configured with a RGB camera and a central depth camera (`ImageType: 2`) to support Phase 2 perception development.

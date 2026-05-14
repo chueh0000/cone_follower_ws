@@ -11,7 +11,7 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + '/launch', ['launch/fsds_simulation.launch.py']),
-        ('share/' + package_name + '/rviz', ['rviz/fsds_config.rviz']),
+        ('share/' + package_name + '/rviz', ['rviz/fsds_config.rviz', 'rviz/cameras.rviz']),
     ],
     install_requires=['setuptools'],
     zip_safe=True,

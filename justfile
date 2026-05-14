@@ -15,6 +15,9 @@ setup:
     # Setup Eigen dependency for AirLib
     mkdir -p src/fsds_simulator/AirSim/AirLib/deps
     ln -sf /usr/include/eigen3 src/fsds_simulator/AirSim/AirLib/deps/eigen3
+    # Link settings.json to the location expected by the simulator
+    mkdir -p ~/Documents/AirSim
+    ln -sf {{justfile_directory()}}/tools/FSDS/settings.json ~/Documents/AirSim/settings.json
 
 download-fsds:
     mkdir -p tools
@@ -47,7 +50,7 @@ run-fsds map="":
     cd tools/FSDS && ./FSDS.sh {{map}} -windowed -ResX=1280 -ResY=720
 
 run-ros-bridge:
-	bash -c "source install/setup.bash && ros2 run fsds_ros2_bridge fsds_ros2_bridge"
+	bash -c "source install/setup.bash && ros2 launch fsds_ros2_bridge fsds_ros2_bridge.launch.py"
 
 run-track-bridge:
     bash -c "source install/setup.bash && ros2 run cone_follower_simulation fsds_track_bridge"
@@ -58,8 +61,11 @@ run-planning:
 run-viz:
     bash -c "source install/setup.bash && (ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 world fsds/map & ros2 run cone_follower_simulation cone_visualization_node)"
 
+run-viz-cameras:
+    bash -c "source install/setup.bash && rviz2 -d src/cone_follower_simulation/rviz/cameras.rviz"
+
 run-control:
     bash -c "source install/setup.bash && ros2 run cone_follower_control pure_pursuit_node"
 
-launch-sim:
-    bash -c "source install/setup.bash && ros2 launch cone_follower_simulation fsds_simulation.launch.py"
+launch-sim viz="true":
+    bash -c "source install/setup.bash && ros2 launch cone_follower_simulation fsds_simulation.launch.py use_camera_viz:={{viz}}"
