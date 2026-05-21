@@ -64,12 +64,13 @@ graph LR
 - **[x] Week 3: ROS 2 Architecture & Visualization**
   - Integrate nodes with FSDS and RViz 2 to verify control and planning in a closed-loop simulation.
 
-### Phase 2: Perception & Reality (Weeks 4-5)
+### Phase 2: Perception & Reality (Weeks 4-5) - [IN PROGRESS]
 *Goal: Handle "Messy World" sensor data.*
-- **Week 4: 2D Perception (YOLO)**
+- **[x] Week 4: 2D Perception (YOLO)**
   - Train YOLO on FSOCO v2 dataset; validate using FSDS virtual camera streams.
-- **Week 5: 3D Perception (ZED API Integration)**
+- **[/] Week 5: 3D Perception (ZED API Integration)**
   - Process ZED `.svo` files and FSDS spatial data to bridge 2D boxes into 3D coordinates.
+  - **Integrated `zed_yolo_tf_node`** for real-time 3D cone localization from ZED Object Detection data.
 
 ---
 
@@ -78,7 +79,7 @@ Use the provided `justfile` and `direnv` (.envrc) to manage the ROS 2 environmen
 
 1. **Setup Workspace:** Run `just setup` to clone the FSDS repository, configure dependencies (e.g., Eigen, COLCON_IGNORE), and symlink the `settings.json` to `~/Documents/AirSim`.
 2. **Download Simulator:** Run `just download-fsds` to fetch the pre-compiled FSDS binary (Linux).
-3. **Build:** Run `just build` to compile the workspace, including the `fsds_ros2_bridge`.
+3. **Build:** Run `just build` to compile the workspace, including the `fsds_ros2_bridge` and `zed_yolo_tf_node`.
 
 ### Running the Simulation
 To run the full autonomous stack in simulation (FSDS):
@@ -86,9 +87,17 @@ To run the full autonomous stack in simulation (FSDS):
 1. **Terminal 1 (FSDS):** `just run-fsds TrainingMap` (or `SmallTrack`, `Skidpad`)
 2. **Terminal 2 (Stack):** `just launch-sim [viz]`
 
-The `just launch-sim` command handles the ROS bridge, track bridge, planning, control, and visualization nodes.
+### Running with ZED Data (SVO or Live)
+To run the perception stack using ZED sensor data:
 
-**Visualization Options:**
+1. **Terminal 1 (Data):** Play a `.svo` file via ZED ROS 2 wrapper or connect live camera.
+2. **Terminal 2 (Stack):** `just launch-zed`
+
+The `just launch-zed` command handles the `zed_yolo_tf_node`, planning, visualization, and opens RViz.
+
+---
+
+**Visualization Options (Simulation):**
 - `just launch-sim true` (default): Opens RViz with a camera-focused view including Cam1 (color) and Depth Camera (scaled 0-20m).
 - `just launch-sim false`: Opens RViz with the standard track visualization (cones and centerline).
 
@@ -107,6 +116,7 @@ The system is configured with a depth camera for perception testing. The `settin
 If you need to verify specific components or run the mock track (no FSDS required):
 
 - **Mock Track (Standalone):** `just run-simulation`
+- **ZED Perception Only:** `just launch-zed`
 - **Individual Nodes:** See `justfile` for `run-planning`, `run-control`, `run-viz`, etc.
 
 ---

@@ -10,8 +10,9 @@ This project focuses on implementing an autonomous navigation stack for an elect
 
 ### 1. Perception Module (`src/cone_follower_perception`)
 - **YOLO Detector:** Trained on FSOCO v2 dataset. Generates 2D bounding boxes of cones.
-- **ZED Custom Object Detection API:** Takes 2D BBoxes and bridges them into 3D $(X, Y, Z)$ coordinates using spatial information.
+- **ZED YOLO TF Node:** Custom node to localize 3D $(X, Y, Z)$ coordinates from ZED Object Detection data.
 - **Data Input:** Supports live ZED 2i camera feed and ZED `.svo` file playback (for offline testing).
+- **Depth Integration:** Utilizes FSDS Depth perspective (ImageType 2) for simulation-based spatial validation.
 
 ### 2. Planning Module (`src/cone_follower_planning`)
 - **Delaunay Triangulation:** Connects 3D cone points to map the track boundaries.
