@@ -15,5 +15,9 @@ setup(
     description='Vehicle interface package for low-level control communication.',
     license='TODO: License declaration',
     tests_require=['pytest'],
-    entry_points={'console_scripts': []},
+    entry_points={
+        'console_scripts': [
+            'vehicle_interface_node_2 = cone_follower_vehicle_interface.vehicle_interface_node_2:main'
+        ],
+    },
 )
