@@ -121,9 +121,11 @@ If you need to verify specific components or run the mock track (no FSDS require
 
 ---
 
-### Phase 3: Hardware Handshake & Field Testing (Weeks 6-7)
+### Phase 3: Hardware Handshake & Field Testing (Weeks 6-7) - [IN PROGRESS]
 *Goal: Deploy to the vehicle and optimize.*
-- **Week 6: Deployment & Actuation**
-  - Migrate to the vehicle laptop and connect the `vehicle_interface_node` to the proprietary control package.
+- **[/] Week 6: Deployment & Actuation**
+  - **Drafted implementation plan** for the `vehicle_interface_node`.
+  - **Integrated proprietary dependencies** (`foxtronpi-pyclient`) including x86-64 binary modules.
+  - Connected the `vehicle_interface_node` logic to use the vehicle's APS Speed Control mode (fixed 1 km/h for initial testing).
 - **Week 7: Field Testing & Tuning**
   - Perform real-world track testing, latency profiling, and parameter refinement.

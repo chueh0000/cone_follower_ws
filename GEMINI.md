@@ -23,7 +23,10 @@ This project focuses on implementing an autonomous navigation stack for an elect
 - **Kinematic Mapping:** Converts target vehicle steering angle to the specific electric SUV's steering wheel angle and speed.
 
 ### 4. Vehicle Interface Module (`src/cone_follower_vehicle_interface`)
-- **Proprietary Interface:** Subscribes to steering and speed commands and passes them to the vehicle's proprietary control package.
+- **Proprietary Integration:** Interfaces with the vehicle's ECU via DoIP/UDS using the `foxtronpi-pyclient` library.
+- **APS Control Strategy:** Due to hardware limitations, movement is controlled via the **APS Speed Control** mode (DID 0x1001), limited to 7 km/h.
+- **Steering Handshake:** Implements the mandatory 5-step reset sequence to gain control authority and maps ROS steering to raw wheel angles (±360 deg).
+- **Binary Dependencies:** Requires x86-64 architecture to run the pre-compiled `.so` communication modules.
 
 ### 5. Simulation & Validation (`FSDS`)
 - **Formula Student Driverless Simulator (FSDS):** Unreal Engine-based simulator for closed-loop testing.
