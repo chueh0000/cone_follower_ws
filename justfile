@@ -69,3 +69,6 @@ run-control:
 
 launch-sim viz="true":
     bash -c "source install/setup.bash && ros2 launch cone_follower_simulation fsds_simulation.launch.py use_camera_viz:={{viz}}"
+
+launch-zed:
+    bash -c "source install/setup.bash && ros2 launch cone_follower_perception zed_perception.launch.py"
