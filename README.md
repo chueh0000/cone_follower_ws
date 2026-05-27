@@ -74,6 +74,35 @@ graph LR
 
 ---
 
+## Prerequisites
+
+Before setting up the workspace, ensure you have the following tools installed:
+
+### 1. Just (Command Runner)
+`just` is used to automate builds, simulation, and deployment tasks.
+- **Ubuntu/Debian:** 
+  ```bash
+  sudo apt install just
+  ```
+- **Pre-compiled Binary (Recommended):**
+  ```bash
+  curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
+  ```
+
+### 2. Direnv (Environment Management)
+`direnv` automatically sources the ROS 2 environment and workspace whenever you enter the project directory.
+- **Install:**
+  ```bash
+  sudo apt install direnv
+  ```
+- **Shell Hook:** Add the following to your `~/.bashrc` (or `~/.zshrc`):
+  ```bash
+  eval "$(direnv hook bash)"
+  ```
+- **Authorize:** Once installed, run `direnv allow` in the project root to enable automatic sourcing.
+
+---
+
 ## Development Workflow
 Use the provided `justfile` and `direnv` (.envrc) to manage the ROS 2 environment and build processes. (Install `justfile` and `direnv` first)
 
