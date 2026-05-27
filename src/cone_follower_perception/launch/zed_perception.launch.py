@@ -8,7 +8,7 @@ def generate_launch_description():
     pkg_planning = get_package_share_directory('cone_follower_planning')
     pkg_simulation = get_package_share_directory('cone_follower_simulation')
     
-    rviz_config_path = os.path.join(pkg_simulation, 'rviz', 'fsds_config.rviz')
+    rviz_config_path = os.path.join(pkg_simulation, 'rviz', 'zed_perception.rviz')
 
     return LaunchDescription([
         # ZED YOLO TF Node (Perception)
