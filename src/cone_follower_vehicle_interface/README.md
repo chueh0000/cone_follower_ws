@@ -17,7 +17,7 @@ graph LR
 ## Implementation Steps
 
 ### 1. Dependencies Integration
-The package will be self-contained by copying the following files from `foxtronpi-pyclient` into the package module directory:
+The package is self-contained and includes the following files from `foxtronpi-pyclient`:
 - `FoxPi_write.py`, `FoxPi_read.py`
 - `client_config.cpython-310-x86_64-linux-gnu.so`
 - `common.cpython-310-x86_64-linux-gnu.so`
@@ -25,7 +25,7 @@ The package will be self-contained by copying the following files from `foxtronp
 *Note: The node must run on x86-64 due to these binary dependencies.*
 
 ### 2. Node Setup & Secure Handshake
-The `vehicle_interface_node` will establish a connection following the `aps_control.py` logic:
+The `vehicle_interface_node` establishes a connection following this logic:
 1.  **Initialize DoIP Client:** `DoIPClient(DOIP_SERVER_IP, DoIP_LOGICAL_ADDRESS, protocol_version=3)`.
 2.  **Establish UDS Connector:** `DoIPClientUDSConnector(doip_client)`.
 3.  **Open UDS Client:** `udsoncan.Client(uds_connection, config=get_uds_client())`.
@@ -35,7 +35,8 @@ The `vehicle_interface_node` will establish a connection following the `aps_cont
     - `Driving_Ctrl` (DID 0x1001) -> 0x00 (21 bytes)
     - `Ctrl_Enable_Switch` -> 0
     - `Ctrl_Enable_Switch` -> 1 ("Armed")
-5.  **Enable APS Mode:** Shift to Drive (`APSShiftPosnReq=5`) and set `APSVMCReqA_flg=1`, `APSStaSystem=2` before processing any ROS commands.
+5.  **Enable APS Mode:** Shift to Drive (`APSShiftPosnReq=5`) and set `APSVMCReqA_flg=1`, `APSStaSystem=2`.
+6.  **Initialize Lamps:** Set Position Lamp and Turn Lamps to **Steady ON** to indicate "Armed/Idle" status.
 
 ### 3. Steering Control Handshake & Constraints
 Before sending steering commands, a specific sequence must be followed to activate the Electronic Power Steering (EPS) angle control.
@@ -44,8 +45,7 @@ Before sending steering commands, a specific sequence must be followed to activa
 1. **Pre-condition:** Ensure `Torque_V`, `Torque_Req`, and `Torque` are all disabled (set to `0`).
 2. **Step A:** Write `Angle_V=1`, `Angle_Req=0`, `Angle=0`.
 3. **Step B:** Wait **200ms**, then write `Angle_V=1`, `Angle_Req=1`, `Angle=0`.
-4. **Step C:** Wait **200ms**, then write `Angle_V=1`, `Angle_Req=1`, `Angle=<Target Angle>`.
-*Note: Subsequent commands do not require the 200ms wait unless EPS dissociates.*
+4. **Step C:** Once initialized, subsequent commands write `Angle_V=1`, `Angle_Req=1`, `Angle=<Target Angle>`.
 
 #### Safety Constraints & Dissociation
 The EPS will dissociate (stop responding) if any of these conditions are met:
@@ -56,29 +56,39 @@ The EPS will dissociate (stop responding) if any of these conditions are met:
 
 If dissociation occurs, reset by setting `Angle_V`, `Angle_Req`, and `Angle` to `0`, then restart from Step A.
 
-### 4. Control Mapping Strategy
-Translates the `cone_follower_msgs/ControlCommand` into the 14-value array required by `FoxPi_Driving_Ctrl`:
-- **Speed:** Ignore variable throttle inputs and maintain a **fixed speed of 1 km/h** (`APSSpeedCMD` = 1).
-- **Steering:** Map normalized ROS steering (`-1.0` to `1.0`) to steering wheel angle (`-360.0` to `+360.0` degrees).
-  - *Calculation:* `TargetWheelAngle = control_msg.steering * 360.0`.
-  - **Critical:** To avoid dissociation, the node must read the current `SAS_Angle` (DID 0x1005) and ensure the target increment does not exceed 100 degrees per command cycle.
-- **APS Configuration:** Set `APSVMCReqA_flg=1` (Applicable), `APSStaSystem=2` (Active), and `APSShiftPosnReq=5` (Drive).
+### 4. Control & Lamp Logic
+
+#### Control Mapping
+Translates `cone_follower_msgs/ControlCommand` into the 14-value array (`driving_ctrl_values`) for `FoxPi_Driving_Ctrl`:
+- **Speed:** Toggled between **0 km/h** and **1 km/h** via the Steering Wheel **Trip** button.
+  - *Dead-man switch:* Node starts at 0 km/h. First press of Trip button enables 1 km/h movement.
+- **Steering:** Map normalized ROS steering (`-1.0` to `1.0`) to wheel angle (`-360.0` to `+360.0`).
+  - **Delta Guard:** Target is clamped to within 95° of current `SAS_Angle` to prevent dissociation.
+
+#### Lamp Control (Software-Defined Blinking)
+- **Position Lamp:** Always **Steady ON** after ARMED.
+- **Turn Lamps (Hazard Mode):**
+    - **Idle (0 km/h):** Steady ON (Hazard indicator).
+    - **Moving (1 km/h):** Blinking at **2Hz** (Software-controlled toggle).
 
 ### 5. Periodic Monitoring
-- **Feedback Loop:** Periodically read and log vehicle status via `FoxPi_read.py`:
+- **Feedback Loop:** The node periodically (2Hz) reads and logs vehicle status via `FoxPi_read.py`:
     - `VehicleSpeed` (DID 0x1002)
     - `SAS_Angle` (DID 0x1005) - **Required for Steering Delta Check**
+    - `SWC_Trip_Sta` (DID 0x1006) - **Required for Speed Toggle**
     - `TqSource` (DID 0x1010)
 
 ### 6. Safety & Shutdown Sequence
-A shutdown handler will be implemented to ensure the vehicle stops safely when the node is terminated:
+A shutdown handler ensures the vehicle stops safely:
 1. Set speed to `0` km/h.
 2. Shift to Park (`APSShiftPosnReq=2`).
-3. Disable APS control.
+3. Disable APS control flags.
 4. Set `Ctrl_Enable_Switch` to `0`.
+5. **Turn OFF all lamps.**
 
 ## Verification Tasks
-- [ ] Successfully build with binary dependencies.
-- [ ] Confirm "Armed" status via console logs.
-- [ ] Verify car moves at 1 km/h in a controlled test field.
-- [ ] Test graceful shutdown sequence.
+- [x] Successfully build with binary dependencies.
+- [x] Confirm "Armed" status via console logs.
+- [x] Verify Trip button toggles target speed.
+- [x] Verify turn lamps blink when moving and are steady when idle.
+- [x] Test graceful shutdown sequence (shifting to Park and clearing lamps).
