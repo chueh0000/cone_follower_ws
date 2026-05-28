@@ -64,13 +64,14 @@ graph LR
 - **[x] Week 3: ROS 2 Architecture & Visualization**
   - Integrate nodes with FSDS and RViz 2 to verify control and planning in a closed-loop simulation.
 
-### Phase 2: Perception & Reality (Weeks 4-5) - [IN PROGRESS]
+### Phase 2: Perception & Reality (Week 5) - [COMPLETED]
 *Goal: Handle "Messy World" sensor data.*
-- **[x] Week 4: 2D Perception (YOLO)**
+- **[ ] Week 4: 2D Perception (YOLO)** - *[SKIPPED: Transitioned directly to 3D integration]*
   - Train YOLO on FSOCO v2 dataset; validate using FSDS virtual camera streams.
-- **[/] Week 5: 3D Perception (ZED API Integration)**
-  - Process ZED `.svo` files and FSDS spatial data to bridge 2D boxes into 3D coordinates.
-  - **Integrated `zed_yolo_tf_node`** for real-time 3D cone localization from ZED Object Detection data.
+- **[x] Week 5: 3D Perception (ZED API Integration)**
+  - Process ZED `rosbag` files and FSDS spatial data to bridge 2D boxes into 3D coordinates.
+  - **Implemented `zed_yolo_tf_node`** for real-time 3D cone localization from ZED Object Detection data.
+
 
 ---
 
@@ -116,10 +117,10 @@ To run the full autonomous stack in simulation (FSDS):
 1. **Terminal 1 (FSDS):** `just run-fsds TrainingMap` (or `SmallTrack`, `Skidpad`)
 2. **Terminal 2 (Stack):** `just launch-sim [viz]`
 
-### Running with ZED Data (SVO or Live)
+### Running with ZED Data (Rosbag or Live)
 To run the perception stack using ZED sensor data:
 
-1. **Terminal 1 (Data):** Play a `.svo` file via ZED ROS 2 wrapper or connect live camera.
+1. **Terminal 1 (Data):** Play a `rosbag` file via ZED ROS 2 wrapper or connect live camera.
 2. **Terminal 2 (Stack):** `just launch-zed`
 
 The `just launch-zed` command handles the `zed_yolo_tf_node`, planning, visualization, and opens RViz.
@@ -152,9 +153,10 @@ If you need to verify specific components or run the mock track (no FSDS require
 
 ### Phase 3: Hardware Handshake & Field Testing (Weeks 6-7) - [IN PROGRESS]
 *Goal: Deploy to the vehicle and optimize.*
-- **[/] Week 6: Deployment & Actuation**
-  - **Drafted implementation plan** for the `vehicle_interface_node`.
-  - **Integrated proprietary dependencies** (`foxtronpi-pyclient`) including x86-64 binary modules.
-  - Connected the `vehicle_interface_node` logic to use the vehicle's APS Speed Control mode (fixed 1 km/h for initial testing).
+- **[x] Week 6: Deployment & Actuation**
+  - **Implemented `vehicle_interface_node`** with secure DoIP/UDS handshake and 5-step reset sequence.
+  - **Integrated Steering Activation Handshake** (3-step) and safety delta guards (95° limit) to prevent EPS dissociation.
+  - **Implemented Speed Toggle** via steering wheel 'Trip' button (dead-man switch) and software-defined blinking for turn lamps.
+
 - **Week 7: Field Testing & Tuning**
   - Perform real-world track testing, latency profiling, and parameter refinement.

@@ -11,7 +11,7 @@ This project focuses on implementing an autonomous navigation stack for an elect
 ### 1. Perception Module (`src/cone_follower_perception`)
 - **YOLO Detector:** Trained on FSOCO v2 dataset. Generates 2D bounding boxes of cones.
 - **ZED YOLO TF Node:** Custom node to localize 3D $(X, Y, Z)$ coordinates from ZED Object Detection data.
-- **Data Input:** Supports live ZED 2i camera feed and ZED `.svo` file playback (for offline testing).
+- **Data Input:** Supports live ZED 2i camera feed and ZED `rosbag` file playback (for offline testing).
 - **Depth Integration:** Utilizes FSDS Depth perspective (ImageType 2) for simulation-based spatial validation.
 
 ### 2. Planning Module (`src/cone_follower_planning`)
@@ -29,7 +29,11 @@ This project focuses on implementing an autonomous navigation stack for an elect
 ### 4. Vehicle Interface Module (`src/cone_follower_vehicle_interface`)
 - **Proprietary Integration:** Interfaces with the vehicle's ECU via DoIP/UDS using the `foxtronpi-pyclient` library.
 - **APS Control Strategy:** Due to hardware limitations, movement is controlled via the **APS Speed Control** mode (DID 0x1001), limited to 7 km/h.
-- **Steering Handshake:** Implements the mandatory 5-step reset sequence to gain control authority and maps ROS steering to raw wheel angles (±360 deg).
+- **Safety Handshake:** Implements mandatory 5-step reset and 3-step steering activation sequences.
+- **Operational Logic:**
+    - **Speed Toggle:** Uses the physical steering wheel **Trip** button as a manual movement trigger (0/1 km/h).
+    - **Steering Safety:** Maps ROS commands to raw wheel angles (±360 deg) with a **95° delta clamp** to prevent dissociation.
+    - **Visual Feedback:** Software-controlled turn lamps (Steady ON when idle, 2Hz blinking when moving).
 - **Binary Dependencies:** Requires x86-64 architecture to run the pre-compiled `.so` communication modules.
 
 ### 5. Simulation & Validation (`FSDS`)
@@ -45,12 +49,12 @@ This project focuses on implementing an autonomous navigation stack for an elect
 ## Development & Deployment Lifecycle
 
 ### Environment Strategy
-- **Mac / Remote Workstation:** Primary development for Phases 1 and 2. Uses FSDS, mock data, and recorded ZED `.svo` files.
+- **Mac / Remote Workstation:** Primary development for Phases 1 and 2. Uses FSDS, mock data, and recorded ZED `rosbag` files.
 - **Vehicle Laptop:** Final deployment and Phase 3. ROS 2 on Ubuntu with direct sensor access.
 
 ### Phased Workflow
 1.  **Phase 1 (Weeks 1-3): Logic & Simulation.** Work with mock 3D points in RViz 2 and FSDS.
-2.  **Phase 2 (Weeks 4-5): Perception Integration.** Transition from mock points to FSDS virtual cameras and ZED `.svo` playback with YOLO.
+2.  **Phase 2 (Week 5): Perception Integration.** Transition from mock points to FSDS virtual cameras and ZED `rosbag` playback. (Week 4 2D Perception skipped in favor of direct 3D integration).
 3.  **Phase 3 (Weeks 6-7): Field Deployment.** Hardware handshake and real-world track testing.
 
 ---
