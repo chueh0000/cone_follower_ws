@@ -10,16 +10,16 @@ The goal is to enable an electric SUV to navigate through a course defined by co
 
 ```mermaid
 graph LR
-    subgraph Inputs ["Perception Inputs"]
+    subgraph Inputs ["Sensor & Sim Inputs"]
         direction TB
         subgraph Simulation ["Simulator Data"]
             SimMap["Ground Truth Map<br/>(fsds_track_bridge)"]
             SimCam["Virtual Camera<br/>(FSDS Virtual Cam)"]
         end
-        ZED_Camera["ZED 2i Camera<br/>(Live Feed / SVO)"]
+        ZED_Camera["ZED 2i Camera<br/>(Live Feed / Rosbag)"]
     end
 
-    Perception["<b>Perception Node</b><br/>(YOLO + 3D Localization)"]
+    Perception["<b>Perception Node</b><br/>(ZED SDK + YOLO)"]
     Planning["<b>Planning Node</b><br/>(Delaunay + Centerline)"]
     Control["<b>Control Node</b><br/>(Pure Pursuit + Kinematics)"]
 
@@ -29,11 +29,11 @@ graph LR
         FoxtronPi["SUV Interface<br/>(Speed, Steering Wheel Angle)"]
     end
 
-    SimMap --> Perception
     SimCam --> Perception
     ZED_Camera --> Perception
 
     Perception -- "ConeArray" --> Planning
+    SimMap -- "ConeArray (GT)" --> Planning
     Planning -- "Path" --> Control
 
     Control --> Drive_Sim
