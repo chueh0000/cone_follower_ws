@@ -33,6 +33,8 @@ class VehicleInterfaceNode(Node):
         self.driving_ctrl_values = [0] * 14
         self.current_target_speed = 0.0
         self.prev_trip_button_state = 0
+        self.lamp_values = [0] * 25
+        self.lamp_blink_state = 1
         
         # Initialize DoIP/UDS Connection
         self.get_logger().info(f"Connecting to vehicle at {DOIP_SERVER_IP}...")
@@ -78,6 +80,16 @@ class VehicleInterfaceNode(Node):
             time.sleep(0.2)
             
             self.steering_activated = True
+            
+            # --- Initialize Lamps (Steady ON Hazard after ARMING) ---
+            self.lamp_values[0] = 1  # Position_Lamp_Enable
+            self.lamp_values[1] = 1  # Position Lamp
+            self.lamp_values[10] = 1 # Left TurnLamp Enable
+            self.lamp_values[11] = 1 # Left TurnLamp
+            self.lamp_values[12] = 1 # Right TurnLamp Enable
+            self.lamp_values[13] = 1 # Right TurnLamp
+            self.fox_write.FoxPi_Lamp_Ctrl(self.lamp_values)
+            
             self.get_logger().info("Vehicle Interface initialized and ARMED.")
             
         except Exception as e:
@@ -92,11 +104,35 @@ class VehicleInterfaceNode(Node):
             10
         )
         
-        # Periodic Status Monitoring Timer (2Hz for logging, higher for internal state if needed)
+        # Periodic Status Monitoring Timer (2Hz)
         self.status_timer = self.create_timer(0.5, self.status_callback)
+        
+        # Lamp Blinking Timer (2Hz)
+        self.lamp_timer = self.create_timer(0.5, self.lamp_callback)
         
         # Shutdown hook
         self.context.on_shutdown(self.shutdown_handler)
+
+    def lamp_callback(self):
+        """Handles software-defined blinking for turn lamps."""
+        if not self.steering_activated:
+            return
+
+        try:
+            if self.current_target_speed > 0:
+                # Blink mode: Toggle turn lamps
+                self.lamp_blink_state = 1 - self.lamp_blink_state
+                self.lamp_values[11] = self.lamp_blink_state
+                self.lamp_values[13] = self.lamp_blink_state
+            else:
+                # Idle mode: Steady ON
+                self.lamp_blink_state = 1
+                self.lamp_values[11] = 1
+                self.lamp_values[13] = 1
+            
+            self.fox_write.FoxPi_Lamp_Ctrl(self.lamp_values)
+        except Exception as e:
+            self.get_logger().warn(f"Failed to write lamp status: {e}")
 
     def status_callback(self):
         try:
@@ -193,6 +229,10 @@ class VehicleInterfaceNode(Node):
             
             # 4. Disable Enable Switch
             self.fox_write.FoxPi_Ctrl_Enable_Switch([0])
+            
+            # 5. Turn off all lamps
+            off_lamps = [0] * 25
+            self.fox_write.FoxPi_Lamp_Ctrl(off_lamps)
             
             self.uds_client.close()
             self.get_logger().info("Vehicle Interface safely shut down.")
