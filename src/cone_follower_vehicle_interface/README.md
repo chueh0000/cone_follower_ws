@@ -68,7 +68,7 @@ Translates the `cone_follower_msgs/ControlCommand` into the 14-value array requi
 - **Feedback Loop:** Periodically read and log vehicle status via `FoxPi_read.py`:
     - `VehicleSpeed` (DID 0x1002)
     - `SAS_Angle` (DID 0x1005) - **Required for Steering Delta Check**
-    - `TqSource` (DID 0x1001)
+    - `TqSource` (DID 0x1010)
 
 ### 6. Safety & Shutdown Sequence
 A shutdown handler will be implemented to ensure the vehicle stops safely when the node is terminated:

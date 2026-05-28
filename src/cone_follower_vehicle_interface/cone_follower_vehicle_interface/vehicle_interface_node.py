@@ -106,13 +106,13 @@ class VehicleInterfaceNode(Node):
             # Read Motion Status (DID 0x1002)
             motion_status = self.fox_read.FoxPi_Motion_Status()
             
-            # Read Control Status (DID 0x1001) for TqSource etc.
-            ctrl_status = self.fox_read.FoxPi_Driving_Ctrl()
+            # Read Motor Status (DID 0x1010) for TqSource
+            motor_status = self.fox_read.FoxPi_Motor_Status()
             
             self.get_logger().info(
                 f"STATUS: Speed: {motion_status['VehicleSpeed']:.1f} kph | "
                 f"SAS: {self.current_sas_angle:.1f} deg | "
-                f"APS_Spd: {ctrl_status['APS_Spd']:.1f} kph"
+                f"TqSource: {motor_status['TqSource']:.1f} "
             )
         except Exception as e:
             self.get_logger().warn(f"Failed to read status: {e}")
