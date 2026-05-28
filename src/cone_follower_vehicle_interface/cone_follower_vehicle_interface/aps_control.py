@@ -105,8 +105,8 @@ def main():
         time.sleep(1)
         
         print("\n--- Step 2: Putting Vehicle in Drive via APS ---")
-        aps_values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, DRIVE_SHIFT_VALUE, 0]
-        FoxPi_Write.FoxPi_Driving_Ctrl(aps_values)
+        driving_ctrl_values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, DRIVE_SHIFT_VALUE, 0]
+        FoxPi_Write.FoxPi_Driving_Ctrl(driving_ctrl_values)
         time.sleep(1)
         
         print("\n--- Step 3: Starting APS Speed Control ---")
@@ -120,13 +120,13 @@ def main():
         listener_thread.start()
         
         # Write initial state once
-        FoxPi_Write.FoxPi_Driving_Ctrl(aps_values)
+        FoxPi_Write.FoxPi_Driving_Ctrl(driving_ctrl_values)
         
         # Main Control Loop
         while not stop_triggered:
             if speed_changed:
-                aps_values[13] = current_speed
-                FoxPi_Write.FoxPi_Driving_Ctrl(aps_values)
+                driving_ctrl_values[13] = current_speed
+                FoxPi_Write.FoxPi_Driving_Ctrl(driving_ctrl_values)
                 # Print on a new line so it doesn't get eaten by the status overwrite
                 print(f"\n\033[92m>>> SPEED UPDATED: {current_speed} km/h <<<\033[0m")
                 speed_changed = False
@@ -137,8 +137,8 @@ def main():
         print("\n\n--- Step 4: Stop Triggered. Decelerating... ---")
         while current_speed > 0:
             current_speed -= 1
-            aps_values[13] = current_speed
-            FoxPi_Write.FoxPi_Driving_Ctrl(aps_values)
+            driving_ctrl_values[13] = current_speed
+            FoxPi_Write.FoxPi_Driving_Ctrl(driving_ctrl_values)
             print(f"\033[93mDecelerating... Target Speed: {current_speed} km/h\033[0m")
             
             read_vehicle_data(FoxPi_Read)
@@ -146,8 +146,8 @@ def main():
                 
         print("\n\n--- Step 5: Putting Vehicle in Park ---")
         time.sleep(2)
-        aps_values[12] = PARK_SHIFT_VALUE 
-        FoxPi_Write.FoxPi_Driving_Ctrl(aps_values)
+        driving_ctrl_values[12] = PARK_SHIFT_VALUE 
+        FoxPi_Write.FoxPi_Driving_Ctrl(driving_ctrl_values)
         time.sleep(1)
             
         print("\n\n--- Step 6: Disabling Control ---")

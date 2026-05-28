@@ -30,7 +30,7 @@ class VehicleInterfaceNode(Node):
         # State
         self.current_sas_angle = 0.0
         self.steering_activated = False
-        self.aps_values = [0] * 14
+        self.driving_ctrl_values = [0] * 14
         
         # Initialize DoIP/UDS Connection
         self.get_logger().info(f"Connecting to vehicle at {DOIP_SERVER_IP}...")
@@ -54,25 +54,25 @@ class VehicleInterfaceNode(Node):
             # --- Enable APS Drive Mode ---
             self.get_logger().info("Enabling APS Drive Mode...")
             # index 10: APS_flg=1, 11: APSSta=2 (Active), 12: Shift=Drive
-            self.aps_values[10] = 1
-            self.aps_values[11] = 2
-            self.aps_values[12] = self.DRIVE_SHIFT_VALUE
-            self.aps_values[13] = 0 # Initial speed 0
-            self.fox_write.FoxPi_Driving_Ctrl(self.aps_values)
+            self.driving_ctrl_values[10] = 1
+            self.driving_ctrl_values[11] = 2
+            self.driving_ctrl_values[12] = self.DRIVE_SHIFT_VALUE
+            self.driving_ctrl_values[13] = 0 # Initial speed 0
+            self.fox_write.FoxPi_Driving_Ctrl(self.driving_ctrl_values)
             time.sleep(1.0)
             
             # --- Initial Steering Handshake ---
             self.get_logger().info("Performing Steering Activation Handshake...")
             # Step A: Valid=1, Req=0, Angle=0
-            self.aps_values[4] = 1
-            self.aps_values[5] = 0
-            self.aps_values[6] = 0
-            self.fox_write.FoxPi_Driving_Ctrl(self.aps_values)
+            self.driving_ctrl_values[4] = 1
+            self.driving_ctrl_values[5] = 0
+            self.driving_ctrl_values[6] = 0
+            self.fox_write.FoxPi_Driving_Ctrl(self.driving_ctrl_values)
             time.sleep(0.2)
             
             # Step B: Valid=1, Req=1, Angle=0
-            self.aps_values[5] = 1
-            self.fox_write.FoxPi_Driving_Ctrl(self.aps_values)
+            self.driving_ctrl_values[5] = 1
+            self.fox_write.FoxPi_Driving_Ctrl(self.driving_ctrl_values)
             time.sleep(0.2)
             
             self.steering_activated = True
@@ -135,20 +135,20 @@ class VehicleInterfaceNode(Node):
             else:
                 target_wheel_angle = self.current_sas_angle - 95.0
 
-        # 3. Update aps_values
-        self.aps_values[6] = target_wheel_angle
-        self.aps_values[13] = self.target_speed # Fixed speed as per plan
+        # 3. Update driving_ctrl_values
+        self.driving_ctrl_values[6] = target_wheel_angle
+        self.driving_ctrl_values[13] = self.target_speed # Fixed speed as per plan
         
         # Ensure APS flags are still set
-        self.aps_values[4] = 1 # Angle_Target_Valid
-        self.aps_values[5] = 1 # Angle_Target_Req
-        self.aps_values[10] = 1 # APS_flg
-        self.aps_values[11] = 2 # APSSta Active
-        self.aps_values[12] = self.DRIVE_SHIFT_VALUE
+        self.driving_ctrl_values[4] = 1 # Angle_Target_Valid
+        self.driving_ctrl_values[5] = 1 # Angle_Target_Req
+        self.driving_ctrl_values[10] = 1 # APS_flg
+        self.driving_ctrl_values[11] = 2 # APSSta Active
+        self.driving_ctrl_values[12] = self.DRIVE_SHIFT_VALUE
         
         # 4. Write to Vehicle
         try:
-            self.fox_write.FoxPi_Driving_Ctrl(self.aps_values)
+            self.fox_write.FoxPi_Driving_Ctrl(self.driving_ctrl_values)
         except Exception as e:
             self.get_logger().error(f"Failed to send control command: {e}")
 
@@ -156,13 +156,13 @@ class VehicleInterfaceNode(Node):
         self.get_logger().info("Shutdown triggered. Safely stopping vehicle...")
         try:
             # 1. Set speed to 0
-            self.aps_values[13] = 0
-            self.fox_write.FoxPi_Driving_Ctrl(self.aps_values)
+            self.driving_ctrl_values[13] = 0
+            self.fox_write.FoxPi_Driving_Ctrl(self.driving_ctrl_values)
             time.sleep(0.5)
             
             # 2. Shift to Park
-            self.aps_values[12] = self.PARK_SHIFT_VALUE
-            self.fox_write.FoxPi_Driving_Ctrl(self.aps_values)
+            self.driving_ctrl_values[12] = self.PARK_SHIFT_VALUE
+            self.fox_write.FoxPi_Driving_Ctrl(self.driving_ctrl_values)
             time.sleep(1.0)
             
             # 3. Disable APS Control
