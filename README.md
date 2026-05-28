@@ -72,6 +72,15 @@ graph LR
   - Process ZED `rosbag` files and FSDS spatial data to bridge 2D boxes into 3D coordinates.
   - **Implemented `zed_yolo_tf_node`** for real-time 3D cone localization from ZED Object Detection data.
 
+### Phase 3: Hardware Handshake & Field Testing (Weeks 6-7) - [IN PROGRESS]
+*Goal: Deploy to the vehicle and optimize.*
+- **[x] Week 6: Deployment & Actuation**
+  - **Implemented `vehicle_interface_node`** with secure DoIP/UDS handshake and 5-step reset sequence.
+  - **Integrated Steering Activation Handshake** (3-step) and safety delta guards (95° limit) to prevent EPS dissociation.
+  - **Implemented Speed Toggle** via steering wheel 'Trip' button (dead-man switch) and software-defined blinking for turn lamps.
+
+- **Week 7: Field Testing & Tuning**
+  - Perform real-world track testing, latency profiling, and parameter refinement.
 
 ---
 
@@ -148,15 +157,3 @@ If you need to verify specific components or run the mock track (no FSDS require
 - **Mock Track (Standalone):** `just run-simulation`
 - **ZED Perception Only:** `just launch-zed`
 - **Individual Nodes:** See `justfile` for `run-planning`, `run-control`, `run-viz`, etc.
-
----
-
-### Phase 3: Hardware Handshake & Field Testing (Weeks 6-7) - [IN PROGRESS]
-*Goal: Deploy to the vehicle and optimize.*
-- **[x] Week 6: Deployment & Actuation**
-  - **Implemented `vehicle_interface_node`** with secure DoIP/UDS handshake and 5-step reset sequence.
-  - **Integrated Steering Activation Handshake** (3-step) and safety delta guards (95° limit) to prevent EPS dissociation.
-  - **Implemented Speed Toggle** via steering wheel 'Trip' button (dead-man switch) and software-defined blinking for turn lamps.
-
-- **Week 7: Field Testing & Tuning**
-  - Perform real-world track testing, latency profiling, and parameter refinement.
