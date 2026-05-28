@@ -31,6 +31,8 @@ class VehicleInterfaceNode(Node):
         self.current_sas_angle = 0.0
         self.steering_activated = False
         self.driving_ctrl_values = [0] * 14
+        self.current_target_speed = 0.0
+        self.prev_trip_button_state = 0
         
         # Initialize DoIP/UDS Connection
         self.get_logger().info(f"Connecting to vehicle at {DOIP_SERVER_IP}...")
@@ -108,11 +110,28 @@ class VehicleInterfaceNode(Node):
             
             # Read Motor Status (DID 0x1010) for TqSource
             motor_status = self.fox_read.FoxPi_Motor_Status()
+
+            # Read Button Status (DID 0x1006) for Speed Toggle
+            button_status = self.fox_read.FoxPi_Button_Status()
+            trip_state = button_status.get('SWC_Trip_Sta', 0)
+            
+            # Toggle Logic (Rising Edge)
+            if trip_state == 1 and self.prev_trip_button_state == 0:
+                if self.current_target_speed > 0:
+                    self.current_target_speed = 0.0
+                    self.get_logger().info("\033[91m[TOGGLE] Speed set to 0.0 km/h\033[0m")
+                else:
+                    self.current_target_speed = self.target_speed
+                    self.get_logger().info(f"\033[92m[TOGGLE] Speed set to {self.current_target_speed} km/h\033[0m")
+            
+            self.prev_trip_button_state = trip_state
             
             self.get_logger().info(
-                f"STATUS: Speed: {motion_status['VehicleSpeed']:.1f} kph | "
+                f"STATUS: Spd: {motion_status['VehicleSpeed']:.1f} | "
                 f"SAS: {self.current_sas_angle:.1f} deg | "
-                f"TqSource: {motor_status['TqSource']:.1f} "
+                f"TqSource: {motor_status['TqSource']:.1f} | "
+                f"Target: {self.current_target_speed:.1f} | "
+                f"Trip_Button: {trip_state}"
             )
         except Exception as e:
             self.get_logger().warn(f"Failed to read status: {e}")
@@ -137,7 +156,7 @@ class VehicleInterfaceNode(Node):
 
         # 3. Update driving_ctrl_values
         self.driving_ctrl_values[6] = target_wheel_angle
-        self.driving_ctrl_values[13] = self.target_speed # Fixed speed as per plan
+        self.driving_ctrl_values[13] = self.current_target_speed
         
         # Ensure APS flags are still set
         self.driving_ctrl_values[4] = 1 # Angle_Target_Valid
