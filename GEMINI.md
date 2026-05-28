@@ -19,7 +19,11 @@ This project focuses on implementing an autonomous navigation stack for an elect
 - **Centerline Generation:** Filters edges and calculates midpoints to create a continuous trajectory (smoothed via B-splines or moving averages).
 
 ### 3. Control Module (`src/cone_follower_control`)
-- **Adaptive Pure Pursuit:** Calculates steering and speed commands based on an adaptive lookahead distance.
+- **Adaptive Pure Pursuit:** Calculates steering and speed commands based on a dynamic lookahead distance.
+- **Enhanced Lookahead Logic:** Lookahead distance is automatically scaled by:
+    - **Velocity:** Increases with speed for high-speed stability.
+    - **Curvature:** Decreases in sharp turns to prevent corner cutting (Robust Change in Heading method).
+    - **Lateral Error:** Increases proportionally to lateral error for gentle, non-oscillatory path recovery.
 - **Kinematic Mapping:** Converts target vehicle steering angle to the specific electric SUV's steering wheel angle and speed.
 
 ### 4. Vehicle Interface Module (`src/cone_follower_vehicle_interface`)
