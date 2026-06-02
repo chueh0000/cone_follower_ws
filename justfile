@@ -15,9 +15,11 @@ setup:
     # Setup Eigen dependency for AirLib
     mkdir -p src/fsds_simulator/AirSim/AirLib/deps
     ln -sfn /usr/include/eigen3 src/fsds_simulator/AirSim/AirLib/deps/eigen3
-    # Link settings.json to the location expected by the simulator
+    # Link settings.json to both locations expected by the simulator and the bridge
     mkdir -p ~/Documents/AirSim
+    mkdir -p ~/Formula-Student-Driverless-Simulator
     ln -sfn {{justfile_directory()}}/tools/FSDS/settings.json ~/Documents/AirSim/settings.json
+    ln -sfn {{justfile_directory()}}/tools/FSDS/settings.json ~/Formula-Student-Driverless-Simulator/settings.json
 
 download-fsds:
     mkdir -p tools
