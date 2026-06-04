@@ -66,6 +66,7 @@ graph LR
 - **Step 1 (Simulator):** `just run-fsds TrainingMap`
 - **Step 2 (Stack):** `just launch-sim false`
 - **What it does:** Uses the simulator's internal "map" to provide perfect cone coordinates to the planner. Bypasses perception to isolate control/planning performance.
+- Demo Video: [YouTube link](https://youtu.be/IipHGM0J3D0?si=R8dTyqCfrm4ses3f) / [Google Drive link](https://drive.google.com/file/d/1FfGchQ7Cq-Om5PTYDIYxig15oGlC0ZDh/view?usp=sharing)
 
 ### 3. Simulator Full Stack (Camera Perception) - *[UNDER DEVELOPMENT]*
 *Use this to test the end-to-end pipeline, including virtual camera processing and 3D localization.*
