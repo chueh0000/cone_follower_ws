@@ -46,6 +46,9 @@ def generate_launch_description():
             executable='centerline_generator_node',
             name='centerline_generator_node',
             output='screen',
+            remappings=[
+                ('/testing_only/odom', '/fsds/testing_only/odom')
+            ]
         ),
         # Pure Pursuit Controller
         Node(

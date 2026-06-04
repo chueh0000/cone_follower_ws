@@ -58,6 +58,22 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /centerline
       Value: true
+    - Class: rviz_default_plugins/Odometry
+      Enabled: true
+      Keep: 100
+      Name: Vehicle Odom
+      Position Tolerance: 0.1
+      Topic:
+        Depth: 5
+        Value: /fsds/testing_only/odom
+      Value: true
+    - Class: rviz_default_plugins/Marker
+      Enabled: true
+      Name: Lookahead Point
+      Topic:
+        Depth: 5
+        Value: /lookahead_marker
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
