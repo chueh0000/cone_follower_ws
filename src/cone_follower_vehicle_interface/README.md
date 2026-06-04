@@ -86,10 +86,20 @@ A shutdown handler ensures the vehicle stops safely:
 4. Set `Ctrl_Enable_Switch` to `0`.
 5. Turn OFF all lamps.
 
-### 7. Dry Run Mode
+### 7. Dry Run & CLI Options
 For logic validation without a physical vehicle or x86-64 environment:
-- **Command:** `just real_dry_run=true launch-real-world`
-- **Behavior:**
+- **Primary Command:** `just real_dry_run=true launch-real-world`
+
+#### Customizable Variables
+The `just launch-real-world` recipe supports several global variables for customization:
+- `real_dry_run` (default: `false`): Enables hardware-free simulation.
+- `real_perception` (default: `true`): Toggles the ZED YOLO perception node.
+- `real_viz` (default: `true`): Toggles RViz 2.
+- `real_odom` (default: `/zed/zed_node/odom`): Sets the odometry input source.
+
+**Usage:** `just real_dry_run=true real_perception=false launch-real-world`
+
+- **Dry Run Behavior:**
     - Skips DoIP/UDS connection and hardware reset sequence.
     - Sets `steering_activated = True` immediately.
     - Mocks status monitoring (SAS Angle, Speed, etc.).

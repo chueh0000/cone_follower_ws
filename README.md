@@ -84,7 +84,20 @@ graph LR
 - **Handshake:** Ensure the steering wheel **Trip** button is ready (dead-man switch).
 - **Full Stack Launch:** `just launch-real-world`
 - **Dry Run (No Vehicle):** `just real_dry_run=true launch-real-world`
-- **What it does:** Consolidates perception, planning, control, and vehicle interface into a single command. Maps ROS steering/speed commands to the SUV's ECU via DoIP/UDS. Includes mandatory safety handshakes and torque/angle limits. In **Dry Run** mode, hardware communication is bypassed, allowing full stack validation on development laptops.
+
+#### CLI Options
+You can customize the real-world launch by passing variables before the recipe:
+| Variable | Default | Description |
+| :--- | :--- | :--- |
+| `real_dry_run` | `false` | If `true`, bypasses vehicle connection and logs drive commands. |
+| `real_perception` | `true` | Set to `false` to skip the ZED YOLO perception node (e.g., if using mock data). |
+| `real_viz` | `true` | Set to `false` to disable RViz. |
+| `real_odom` | `/zed/zed_node/odom` | The odometry topic to use for planning and control. |
+
+**Example:** `just real_dry_run=true real_viz=false launch-real-world`
+
+- **What it does:** Consolidates perception, planning, control, and vehicle interface into a single command.
+ Maps ROS steering/speed commands to the SUV's ECU via DoIP/UDS. Includes mandatory safety handshakes and torque/angle limits. In **Dry Run** mode, hardware communication is bypassed, allowing full stack validation on development laptops.
 
 ---
 
