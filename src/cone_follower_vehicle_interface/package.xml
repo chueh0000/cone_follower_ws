@@ -7,5 +7,10 @@
   <license>TODO: License declaration</license>
   <depend>rclpy</depend>
   <depend>cone_follower_msgs</depend>
+  <depend>python3-doipclient</depend>
+  <depend>python3-udsoncan</depend>
+  <depend>python3-cffi</depend>
+  <depend>python3-cryptography</depend>
+  <depend>python3-pycparser</depend>
   <export><build_type>ament_python</build_type></export>
 </package>
