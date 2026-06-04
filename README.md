@@ -81,10 +81,8 @@ graph LR
 ### 5. Real-World Deployment (Vehicle Integration)
 *Use this for final deployment on the physical electric SUV.*
 - **Handshake:** Ensure the steering wheel **Trip** button is ready (dead-man switch).
-- **Perception:** `just launch-zed`
-- **Planning & Control:** `just run-planning` and `just run-control`
-- **Vehicle Interface:** `ros2 run cone_follower_vehicle_interface vehicle_interface_node`
-- **What it does:** Maps ROS steering/speed commands to the SUV's ECU via DoIP/UDS. Includes mandatory safety handshakes and torque/angle limits.
+- **Full Stack Launch:** `just launch-real-world`
+- **What it does:** Consolidates perception, planning, control, and vehicle interface into a single command. Maps ROS steering/speed commands to the SUV's ECU via DoIP/UDS. Includes mandatory safety handshakes and torque/angle limits.
 
 ---
 

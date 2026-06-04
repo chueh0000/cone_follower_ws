@@ -67,4 +67,5 @@ This project focuses on implementing an autonomous navigation stack for an elect
     - Symlinks project `settings.json` to `~/Documents/AirSim/settings.json` to keep simulator and ROS bridge in sync.
     - Configures Eigen and build optimizations (`COLCON_IGNORE`).
 - **Simulation First:** Verify all algorithmic changes using FSDS before testing on hardware.
+- **Real-World Deployment:** Use `just launch-real-world` for field testing. This consolidates perception, planning, control, and the vehicle interface into a single command, defaulted to use the ZED camera's odometry.
 - **Sensor Configuration:** The simulator is configured with a RGB camera and a central depth camera (`ImageType: 2`) to support Phase 2 perception development.

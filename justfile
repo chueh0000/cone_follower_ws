@@ -79,3 +79,6 @@ launch-sim viz="true":
 
 launch-zed:
     bash -c "source install/setup.bash && ros2 launch cone_follower_perception zed_perception.launch.py"
+
+launch-real-world viz="true" odom="/zed/zed_node/odom":
+    bash -c "source install/setup.bash && ros2 launch cone_follower_vehicle_interface real_world.launch.py use_rviz:={{viz}} odom_topic:={{odom}}"
