@@ -40,6 +40,12 @@ graph LR
     Control --> FoxtronPi
 ```
 
+### Gallery
+
+| Real-World Vehicle (Luxgen n7) | FSDS Simulator Environment |
+| :---: | :---: |
+| ![Luxgen n7](docs/images/luxgen_n7.png) | ![FSDS Simulator](docs/images/fsds_simulator.png) |
+
 ### Hardware & Deployment
 - **Development Environment:** Ubuntu Workstation with GPU (Remote).
 - **Deployment Platform:** Ubuntu Laptop + ROS 2 + GPU (mounted on the vehicle).
