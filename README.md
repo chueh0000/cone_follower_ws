@@ -41,15 +41,59 @@ graph LR
 ```
 
 ### Hardware & Deployment
-- **Development Environment:** Mac or Remote Ubuntu Workstation with GPU (no sensor attached).
+- **Development Environment:** Ubuntu Workstation with GPU (Remote).
 - **Deployment Platform:** Ubuntu Laptop + ROS 2 + GPU (mounted on the vehicle).
-- **Primary Sensor:** ZED 2i camera for 2D bounding box generation and 3D spatial coordinate extraction.
+- **Primary Sensor:** ZED 2i camera for 3D spatial coordinate extraction.
 ### Software Stack
-- **Perception:** YOLO (trained on FSOCO v2) for 2D detection + ZED Object Detection API (Custom Detector) for 3D localization.
+- **Perception:** YOLO + ZED Object Detection API (Custom Detector) for 3D localization.
 - **Planning:** Delaunay Triangulation for track mapping and centerline generation.
 - **Control:** Adaptive Pure Pursuit for trajectory following and steering wheel angle calculation.
 - **Simulation:** Formula Student Driverless Simulator (FSDS) for high-fidelity vehicle dynamics and sensor emulation.
 - **Actuation:** Proprietary Python package for low-level vehicle control (steering wheel angle and speed).
+
+---
+
+## Prerequisites & Setup
+
+1. **Environment:** Install `just` (command runner) and `direnv` (env manager).
+2. **Initialize:** Run `just setup` to clone submodules and install all ROS 2 dependencies.
+3. **Simulator:** Run `just download-fsds` to fetch the FSDS binary.
+4. **Build:** Run `just build` to compile the workspace.
+
+---
+
+## Usage by Use Case
+
+### 1. Mock Track Evaluation (Centerline Only)
+*Use this to test the Delaunay triangulation and path smoothing logic without the simulator or camera.*
+- **Command:** `just run-simulation`
+- **What it does:** Publishes a static set of 3D cone points. You should also run `just run-planning` and `just run-viz` to see the generated centerline in RViz.
+
+### 2. Simulator Driving (Ground Truth Cones)
+*Use this to evaluate the Adaptive Pure Pursuit controller and path planning in a closed-loop environment.*
+- **Step 1 (Simulator):** `just run-fsds TrainingMap`
+- **Step 2 (Stack):** `just launch-sim false`
+- **What it does:** Uses the simulator's internal "map" to provide perfect cone coordinates to the planner. Bypasses perception to isolate control/planning performance.
+
+### 3. Simulator Full Stack (Camera Perception) - *[UNDER DEVELOPMENT]*
+*Use this to test the end-to-end pipeline, including virtual camera processing and 3D localization.*
+- **Step 1 (Simulator):** `just run-fsds TrainingMap`
+- **Step 2 (Stack):** `just launch-sim true`
+- **What it does:** Enables the virtual camera stream and depth mapping. The system must detect and localize cones itself before planning a path.
+
+### 4. Real-World Perception (Camera Only)
+*Use this to validate the ZED YOLO TF node and cone localization using live or recorded data.*
+- **Live/Rosbag:** Play a ZED `rosbag` or connect the camera.
+- **Perception Launch:** `just launch-zed`
+- **What it does:** Runs the YOLO detector and spatial mapping. Visualizes localized 3D cones in RViz.
+
+### 5. Real-World Deployment (Vehicle Integration)
+*Use this for final deployment on the physical electric SUV.*
+- **Handshake:** Ensure the steering wheel **Trip** button is ready (dead-man switch).
+- **Perception:** `just launch-zed`
+- **Planning & Control:** `just run-planning` and `just run-control`
+- **Vehicle Interface:** `ros2 run cone_follower_vehicle_interface vehicle_interface_node`
+- **What it does:** Maps ROS steering/speed commands to the SUV's ECU via DoIP/UDS. Includes mandatory safety handshakes and torque/angle limits.
 
 ---
 
@@ -58,29 +102,21 @@ graph LR
 ### Phase 1: Logic & Simulation (Weeks 1-3) - [COMPLETED]
 *Goal: Build the "Perfect World" logic in software.*
 - **[x] Week 1: Mock Data & Path Planning**
-  - Implement Delaunay Triangulation to generate track centerlines from synthetic 3D points.
-- **[x] Week 2: Control System & Kinematics**
-  - Implement Adaptive Pure Pursuit and map vehicle steering to steering wheel angles. *(Note: Implementation complete; fine-tuning in progress)*
+- **[x] Week 2: Control System & Kinematics** (PID Speed Control & Adaptive Lookahead)
 - **[x] Week 3: ROS 2 Architecture & Visualization**
-  - Integrate nodes with FSDS and RViz 2 to verify control and planning in a closed-loop simulation.
 
-### Phase 2: Perception & Reality (Week 5) - [COMPLETED]
+### Phase 2: Perception & Reality (Week 4-5) - [COMPLETED]
 *Goal: Handle "Messy World" sensor data.*
 - **[ ] Week 4: 2D Perception (YOLO)** - *[SKIPPED: Transitioned directly to 3D integration]*
   - Train YOLO on FSOCO v2 dataset; validate using FSDS virtual camera streams.
 - **[x] Week 5: 3D Perception (ZED API Integration)**
-  - Process ZED `rosbag` files and FSDS spatial data to bridge 2D boxes into 3D coordinates.
-  - **Implemented `zed_yolo_tf_node`** for real-time 3D cone localization from ZED Object Detection data.
+  - Implemented `zed_yolo_tf_node` for real-time 3D cone localization.
 
 ### Phase 3: Hardware Handshake & Field Testing (Weeks 6-7) - [IN PROGRESS]
-*Goal: Deploy to the vehicle and optimize.*
 - **[x] Week 6: Deployment & Actuation**
-  - **Implemented `vehicle_interface_node`** with secure DoIP/UDS handshake and 5-step reset sequence.
-  - **Integrated Steering Activation Handshake** (3-step) and safety delta guards (95° limit) to prevent EPS dissociation.
-  - **Implemented Speed Toggle** via steering wheel 'Trip' button (dead-man switch) and software-defined blinking for turn lamps.
-
-- **Week 7: Field Testing & Tuning**
-  - Perform real-world track testing, latency profiling, and parameter refinement.
+  - Integrated Steering Activation Handshake and safety delta guards.
+- **[ ] Week 7: Field Testing & Tuning**
+  - Parameter refinement and real-world track testing.
 
 ---
 
@@ -110,51 +146,3 @@ Before setting up the workspace, ensure you have the following tools installed:
   eval "$(direnv hook bash)"
   ```
 - **Authorize:** Once installed, run `direnv allow` in the project root to enable automatic sourcing.
-
----
-
-## Development Workflow
-Use the provided `justfile` and `direnv` (.envrc) to manage the ROS 2 environment and build processes. (Install `justfile` and `direnv` first)
-
-1. **Setup Workspace:** Run `just setup` to clone the FSDS repository, configure dependencies (e.g., Eigen, COLCON_IGNORE), and symlink the `settings.json` to `~/Documents/AirSim`. This command also automatically installs the required ROS 2 and Python dependencies.
-2. **Install Dependencies Individually:** If you only need to update dependencies, run `just deps`. This uses `rosdep` to install all necessary system and Python packages.
-3. **Download Simulator:** Run `just download-fsds` to fetch the pre-compiled FSDS binary (Linux).
-4. **Build:** Run `just build` to compile the workspace, including the `fsds_ros2_bridge` and `zed_yolo_tf_node`.
-
-### Running the Simulation
-To run the full autonomous stack in simulation (FSDS):
-
-1. **Terminal 1 (FSDS):** `just run-fsds TrainingMap` (or `SmallTrack`, `Skidpad`)
-2. **Terminal 2 (Stack):** `just launch-sim [viz]`
-
-### Running with ZED Data (Rosbag or Live)
-To run the perception stack using ZED sensor data:
-
-1. **Terminal 1 (Data):** Play a `rosbag` file via ZED ROS 2 wrapper or connect live camera.
-2. **Terminal 2 (Stack):** `just launch-zed`
-
-The `just launch-zed` command handles the `zed_yolo_tf_node`, planning, visualization, and opens RViz.
-
----
-
-**Visualization Options (Simulation):**
-- `just launch-sim true` (default): Opens RViz with a camera-focused view including Cam1 (color) and Depth Camera (scaled 0-20m).
-- `just launch-sim false`: Opens RViz with the standard track visualization (cones and centerline).
-
-**In RViz 2:**
-- The configuration is automatically loaded based on your `viz` choice.
-- **Depth Visualization:** The depth camera image is pre-scaled in the `cameras.rviz` config. If viewing manually, ensure **Normalize Range** is off and set the range to 0.0 - 20.0 for best contrast.
-
----
-
-### Camera Configuration
-The system is configured with a depth camera for perception testing. The `settings.json` (found in `tools/FSDS/`) includes:
-- `cam1`: Standard RGB camera.
-- `depth_cam`: Depth camera (ImageType 2) mounted centrally for spatial mapping.
-
-### Legacy/Individual Node Execution
-If you need to verify specific components or run the mock track (no FSDS required):
-
-- **Mock Track (Standalone):** `just run-simulation`
-- **ZED Perception Only:** `just launch-zed`
-- **Individual Nodes:** See `justfile` for `run-planning`, `run-control`, `run-viz`, etc.
