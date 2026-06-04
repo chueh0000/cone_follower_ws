@@ -1,0 +1,7 @@
+cffi==1.17.1
+cryptography==45.0.6
+doipclient==1.1.7
+pycparser==2.22
+udsoncan==1.25.0
+pyqtgraph==0.13.7
+numpy==2.2.3

@@ -11,11 +11,14 @@ default:
 
 # --- Setup & Build ---
 
-# Install ROS dependencies
+# Install ROS dependencies and Python packages
 deps:
     sudo apt-get update
     rosdep update
     rosdep install --from-paths src --ignore-src -r -y
+    # Install Python dependencies in the direnv virtual environment
+    pip install --upgrade pip
+    pip install -r requirements.txt
 
 # Setup the workspace and FSDS simulator
 setup: deps
