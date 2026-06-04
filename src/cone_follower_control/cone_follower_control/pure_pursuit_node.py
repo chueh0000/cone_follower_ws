@@ -21,6 +21,9 @@ class PurePursuitNode(Node):
         self.declare_parameter('lookahead_error_k', 0.2)
         self.declare_parameter('target_velocity', 3.0) 
         self.declare_parameter('steering_gain', -1.0)
+        self.declare_parameter('kp_v', 0.1)
+        self.declare_parameter('ki_v', 0.01)
+        self.declare_parameter('kd_v', 0.02)
         
         self.L = self.get_parameter('wheelbase').value
         self.K = self.get_parameter('lookahead_k').value
@@ -35,6 +38,9 @@ class PurePursuitNode(Node):
         self.path = None
         self.current_pose = None
         self.current_vel = 0.0
+        self.prev_speed_error = 0.0
+        self.speed_error_integral = 0.0
+        self.last_time = self.get_clock().now()
         
         # Subscribers
         self.path_sub = self.create_subscription(Path, '/centerline', self.path_callback, qos_profile)
@@ -97,18 +103,52 @@ class PurePursuitNode(Node):
         steering_angle = math.atan2(2.0 * self.L * target_y_v, actual_ld**2)
         normalized_steering = max(-1.0, min(1.0, (steering_angle / 0.52) * self.get_parameter('steering_gain').value))
         
-        # 6. Speed Control
+        # 6. Speed Control (PID)
+        current_time = self.get_clock().now()
+        if self.last_time is None:
+            self.last_time = current_time
+            return
+
+        dt = (current_time - self.last_time).nanoseconds / 1e9
+        if dt <= 0.0: dt = 0.02
+        
         v_limit = self.get_parameter('target_velocity').value / (1.0 + 5.0 * kappa)
         speed_error = v_limit - self.current_vel
         
+        # PID Calculation
+        kp = self.get_parameter('kp_v').value
+        ki = self.get_parameter('ki_v').value
+        kd = self.get_parameter('kd_v').value
+        
+        self.speed_error_integral += speed_error * dt
+        # Simple anti-windup: cap the integral term
+        self.speed_error_integral = max(-2.0, min(2.0, self.speed_error_integral))
+        
+        if self.prev_speed_error is None:
+            d_error = 0.0
+        else:
+            d_error = (speed_error - self.prev_speed_error) / dt
+        
+        pid_output = (kp * speed_error) + (ki * self.speed_error_integral) + (kd * d_error)
+        
         control_msg = ControlCommand()
-        control_msg.header.stamp = self.get_clock().now().to_msg()
-        # Increased base throttle for simulator stability
-        control_msg.throttle = min(1.0, 0.25 + 0.1 * speed_error) if speed_error > 0 else 0.0
-        control_msg.brake = min(1.0, 0.3 * abs(speed_error)) if speed_error < -0.5 else 0.0
+        control_msg.header.stamp = current_time.to_msg()
+        
+        # Map PID output to throttle and brake
+        if pid_output > 0:
+            control_msg.throttle = min(1.0, 0.25 + pid_output)
+            control_msg.brake = 0.0
+        else:
+            control_msg.throttle = 0.0
+            # Only apply brake if error is significant to prevent jitter
+            control_msg.brake = min(1.0, abs(pid_output)) if speed_error < -0.5 else 0.0
+            
         control_msg.steering = float(normalized_steering)
         
-        self.get_logger().info(f"CTRL: Steer: {control_msg.steering:.2f} | Thr: {control_msg.throttle:.2f} | Brk: {control_msg.brake:.2f} | Vel: {self.current_vel:.2f}", throttle_duration_sec=1.0)
+        self.prev_speed_error = speed_error
+        self.last_time = current_time
+        
+        self.get_logger().info(f"CTRL: Steer: {control_msg.steering:.2f} | Thr: {control_msg.throttle:.2f} | Brk: {control_msg.brake:.2f} | Vel: {self.current_vel:.2f} | Vlim: {v_limit:.2f} | Kap: {kappa:.2f}", throttle_duration_sec=0.5)
         
         self.control_pub.publish(control_msg)
 
@@ -125,11 +165,25 @@ class PurePursuitNode(Node):
                 idx_min = i
         
         kappa = 0.0
-        if idx_min < len(self.path.poses) - 10:
-            p1, p2, p3 = self.path.poses[idx_min].pose.position, self.path.poses[idx_min+5].pose.position, self.path.poses[idx_min+10].pose.position
-            t1 = math.atan2(p2.y-p1.y, p2.x-p1.x)
-            t2 = math.atan2(p3.y-p2.y, p3.x-p2.x)
-            kappa = abs((t2 - t1 + math.pi) % (2*math.pi) - math.pi) / 2.0
+        # Increased window for more robust curvature estimation
+        window = 10
+        if idx_min < len(self.path.poses) - (2 * window):
+            p1 = self.path.poses[idx_min].pose.position
+            p2 = self.path.poses[idx_min + window].pose.position
+            p3 = self.path.poses[idx_min + 2 * window].pose.position
+            
+            t1 = math.atan2(p2.y - p1.y, p2.x - p1.x)
+            t2 = math.atan2(p3.y - p2.y, p3.x - p2.x)
+            
+            angle_diff = (t2 - t1 + math.pi) % (2 * math.pi) - math.pi
+            
+            # Distance between midpoints of the two segments
+            d1 = math.sqrt((p2.x - p1.x)**2 + (p2.y - p1.y)**2)
+            d2 = math.sqrt((p3.x - p2.x)**2 + (p3.y - p2.y)**2)
+            ds = (d1 + d2) / 2.0
+            
+            if ds > 0.1:
+                kappa = abs(angle_diff) / ds
             
         return min_dist, kappa, idx_min
 
