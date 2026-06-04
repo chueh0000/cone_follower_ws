@@ -53,15 +53,6 @@ graph LR
 
 ---
 
-## Prerequisites & Setup
-
-1. **Environment:** Install `just` (command runner) and `direnv` (env manager).
-2. **Initialize:** Run `just setup` to clone submodules and install all ROS 2 dependencies.
-3. **Simulator:** Run `just download-fsds` to fetch the FSDS binary.
-4. **Build:** Run `just build` to compile the workspace.
-
----
-
 ## Usage by Use Case
 
 ### 1. Mock Track Evaluation (Centerline Only)
@@ -120,11 +111,19 @@ graph LR
 
 ---
 
-## Prerequisites
+## Prerequisites & Setup
+
+1. **Environment:** Install `just` (command runner) and `direnv` (env manager).
+2. **Initialize:** Run `just setup` to clone submodules and install all ROS 2 dependencies.
+3. **Simulator:** Run `just download-fsds` to fetch the FSDS binary.
+4. **Build:** Run `just build` to compile the workspace.
+
+
+### Environment Tools Installation Instruction
 
 Before setting up the workspace, ensure you have the following tools installed:
 
-### 1. Just (Command Runner)
+#### 1. Just (Command Runner)
 `just` is used to automate builds, simulation, and deployment tasks.
 - **Ubuntu/Debian:** 
   ```bash
@@ -135,7 +134,7 @@ Before setting up the workspace, ensure you have the following tools installed:
   curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
   ```
 
-### 2. Direnv (Environment Management)
+#### 2. Direnv (Environment Management)
 `direnv` automatically sources the ROS 2 environment and workspace whenever you enter the project directory.
 - **Install:**
   ```bash
