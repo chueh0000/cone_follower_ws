@@ -1,7 +1,12 @@
 default:
     @just --list
 
-setup:
+deps:
+    sudo apt-get update
+    rosdep update
+    rosdep install --from-paths src --ignore-src -r -y
+
+setup: deps
     # Clone FSDS with submodules, skipping heavy LFS assets
     if [ ! -d "src/fsds_simulator" ]; then \
         GIT_LFS_SKIP_SMUDGE=1 git clone --depth 1 --recurse-submodules https://github.com/FS-Driverless/Formula-Student-Driverless-Simulator.git src/fsds_simulator; \
