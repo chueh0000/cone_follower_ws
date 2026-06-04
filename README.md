@@ -116,9 +116,10 @@ Before setting up the workspace, ensure you have the following tools installed:
 ## Development Workflow
 Use the provided `justfile` and `direnv` (.envrc) to manage the ROS 2 environment and build processes. (Install `justfile` and `direnv` first)
 
-1. **Setup Workspace:** Run `just setup` to clone the FSDS repository, configure dependencies (e.g., Eigen, COLCON_IGNORE), and symlink the `settings.json` to `~/Documents/AirSim`.
-2. **Download Simulator:** Run `just download-fsds` to fetch the pre-compiled FSDS binary (Linux).
-3. **Build:** Run `just build` to compile the workspace, including the `fsds_ros2_bridge` and `zed_yolo_tf_node`.
+1. **Setup Workspace:** Run `just setup` to clone the FSDS repository, configure dependencies (e.g., Eigen, COLCON_IGNORE), and symlink the `settings.json` to `~/Documents/AirSim`. This command also automatically installs the required ROS 2 and Python dependencies.
+2. **Install Dependencies Individually:** If you only need to update dependencies, run `just deps`. This uses `rosdep` to install all necessary system and Python packages.
+3. **Download Simulator:** Run `just download-fsds` to fetch the pre-compiled FSDS binary (Linux).
+4. **Build:** Run `just build` to compile the workspace, including the `fsds_ros2_bridge` and `zed_yolo_tf_node`.
 
 ### Running the Simulation
 To run the full autonomous stack in simulation (FSDS):
