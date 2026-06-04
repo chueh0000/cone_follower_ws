@@ -34,6 +34,9 @@ This node subscribes to the planned centerline and vehicle odometry to compute t
 | `lookahead_error_k` | `double` | `0.2` | Gain for increasing lookahead distance based on lateral error to smooth recovery. |
 | `target_velocity` | `double` | `3.0` | Base target cruise velocity (m/s). |
 | `steering_gain` | `double` | `-1.0` | Final multiplier for the steering command (used for direction correction). |
+| `kp_v` | `double` | `0.15` | Proportional gain for velocity PID control. |
+| `ki_v` | `double` | `0.05` | Integral gain for velocity PID control. |
+| `kd_v` | `double` | `0.05` | Derivative gain for velocity PID control. |
 
 ## Algorithm: Adaptive Pure Pursuit
 
@@ -48,14 +51,13 @@ $$L_d = \max\left(L_{min}, \min\left(L_{max}, \frac{K \cdot V}{1 + k_c \cdot \ka
 - **Error Compensation ($k_e$):** Increases $L_d$ when the vehicle is far from the path to ensure a smooth, non-oscillatory approach back to the centerline.
 
 ### 2. Curvature Estimation
-Path curvature ($\kappa$) is estimated using a "Robust Change in Heading" method, looking at the angular difference between segments formed by three consecutive points on the path ahead of the closest point.
+Path curvature ($\kappa$) is estimated using a robust window-based method that calculates the angular change over a smoothed segment of the path, divided by the arc length ($ds = \Delta \theta / \Delta s$). This value is low-pass filtered to ensure stable speed transitions.
 
 ### 3. Longitudinal Control
 The target speed is automatically reduced in high-curvature sections:
-$$V_{limit} = \frac{V_{target}}{1 + 5.0 \cdot \kappa}$$
-A simple proportional controller then maps the velocity error to throttle and brake commands for the simulator.
+$$V_{limit} = \frac{V_{target}}{1 + 2.0 \cdot \kappa}$$
+A PID controller then maps the velocity error to throttle and brake commands for the simulator to eliminate steady-state error and improve acceleration smoothness.
 
 ## TODOs
-- [ ] **PID Speed Control:** Replace the current P-controller with a full PID (Proportional-Integral-Derivative) loop to eliminate steady-state velocity error and improve acceleration smoothness.
+- [x] **PID Speed Control:** Replace the current P-controller with a full PID (Proportional-Integral-Derivative) loop to eliminate steady-state velocity error and improve acceleration smoothness.
 - [ ] **Dynamic Gains:** Implement gain scheduling for the PID controller based on the current velocity and track surface conditions.
-
