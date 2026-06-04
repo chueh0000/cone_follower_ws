@@ -45,6 +45,7 @@ graph LR
 - **Deployment Platform:** Ubuntu Laptop + ROS 2 + GPU (mounted on the vehicle).
 - **Primary Sensor:** ZED 2i camera for 3D spatial coordinate extraction.
 ### Software Stack
+- **Framework:** ROS 2 (Humble) as the primary middleware and communication layer.
 - **Perception:** YOLO + ZED Object Detection API (Custom Detector) for 3D localization.
 - **Planning:** Delaunay Triangulation for track mapping and centerline generation.
 - **Control:** Adaptive Pure Pursuit for trajectory following and steering wheel angle calculation.
@@ -111,7 +112,7 @@ graph LR
 
 ## Prerequisites & Setup
 
-1. **Environment:** Install `just` (command runner) and `direnv` (env manager).
+1. **Environment:** Install ROS 2 (Humble), `rosdep`, `just` (command runner) and `direnv` (env manager).
 2. **Initialize:** Run `just setup` to clone submodules and install all ROS 2 dependencies.
 3. **Simulator:** Run `just download-fsds` to fetch the FSDS binary.
 4. **Build:** Run `just build` to compile the workspace.
@@ -143,3 +144,13 @@ Before setting up the workspace, ensure you have the following tools installed:
   eval "$(direnv hook bash)"
   ```
 - **Authorize:** Once installed, run `direnv allow` in the project root to enable automatic sourcing.
+
+#### 3. ROS 2 & Rosdep
+This project is built using ROS 2 Humble Hawksbill.
+- **Install ROS 2:** Follow the [official ROS 2 Humble installation guide](https://docs.ros.org/en/humble/Installation.html).
+- **Initialize Rosdep:** `rosdep` is used to manage system dependencies.
+  ```bash
+  sudo apt install python3-rosdep
+  sudo rosdep init
+  rosdep update
+  ```
