@@ -12,6 +12,7 @@ def generate_launch_description():
     # Launch arguments
     use_rviz = LaunchConfiguration('use_rviz')
     odom_topic = LaunchConfiguration('odom_topic')
+    use_perception = LaunchConfiguration('use_perception')
 
     rviz_config_path = os.path.join(pkg_simulation, 'rviz', 'zed_perception.rviz')
 
@@ -26,6 +27,11 @@ def generate_launch_description():
             default_value='/zed/zed_node/odom',
             description='Topic for odometry input (e.g., from ZED SDK)'
         ),
+        DeclareLaunchArgument(
+            'use_perception',
+            default_value='true',
+            description='Launch ZED YOLO perception node if true'
+        ),
 
         # 1. Perception: ZED YOLO TF Node
         Node(
@@ -33,6 +39,7 @@ def generate_launch_description():
             executable='zed_yolo_tf_node',
             name='zed_yolo_tf',
             output='screen',
+            condition=IfCondition(use_perception)
         ),
 
         # 2. Planning: Centerline Generator
