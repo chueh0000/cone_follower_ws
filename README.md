@@ -114,9 +114,10 @@ graph LR
 ## Prerequisites & Setup
 
 1. **Environment:** Install ROS 2 (Humble), `rosdep`, `just` (command runner) and `direnv` (env manager).
-2. **Initialize:** Run `just setup` to clone submodules and install all ROS 2 dependencies.
-3. **Simulator:** Run `just download-fsds` to fetch the FSDS binary.
-4. **Build:** Run `just build` to compile the workspace.
+2. **Authorize Environment:** Run `direnv allow` in the project root to initialize the Python virtual environment and source ROS 2.
+3. **Initialize:** Run `just setup` to clone submodules and install all ROS 2 (system) and Python (pip) dependencies.
+4. **Simulator:** Run `just download-fsds` to fetch the FSDS binary.
+5. **Build:** Run `just build` to compile the workspace.
 
 
 ### Environment Tools Installation Instruction

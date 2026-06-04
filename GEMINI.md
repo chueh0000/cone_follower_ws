@@ -62,9 +62,10 @@ This project focuses on implementing an autonomous navigation stack for an elect
 ---
 
 ## Development Conventions
-- **Tooling:** Use `just` for command automation and `direnv` for automatic ROS 2 environment sourcing. 
+- **Tooling:** Use `just` for command automation and `direnv` for automatic ROS 2 environment and Python virtual environment management.
 - **Setup:** `just setup` performs a robust initialization:
-    - Installs all system and Python dependencies via `rosdep` (can be run individually as `just deps`).
+    - Installs system dependencies via `rosdep` and Python packages via `pip` from `requirements.txt` (via `just deps`).
+    - Configures a Python 3.10 virtual environment with system site-packages using `direnv`.
     - Shallow clones FSDS with submodules.
     - Symlinks project `settings.json` to `~/Documents/AirSim/settings.json` to keep simulator and ROS bridge in sync.
     - Configures Eigen and build optimizations (`COLCON_IGNORE`).
