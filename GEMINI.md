@@ -42,8 +42,9 @@ This project focuses on implementing an autonomous navigation stack for an elect
 - **ROS 2 Bridge:** Facilitates communication between the autonomous stack and the simulator.
 - **AirLib Physics:** Provides realistic vehicle dynamics for control law validation.
 
-### 6. Custom Messages (`src/cone_follower_msgs`)
-- Centralized definitions for perception and control data structures to ensure consistency across nodes.
+### 6. Message Interfaces
+- **`cone_follower_msgs`:** Custom definitions for perception data structures (e.g., `Cone`, `ConeArray`) used to pass localized track information.
+- **`fs_msgs`:** Standardized control data structures (e.g., `ControlCommand`) provided by the FSDS ROS bridge to ensure compatibility between the controller and the vehicle interface.
 
 ---
 
