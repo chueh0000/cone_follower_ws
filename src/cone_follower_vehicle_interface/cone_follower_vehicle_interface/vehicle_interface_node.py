@@ -2,17 +2,7 @@ import rclpy
 from rclpy.node import Node
 import time
 import math
-from cone_follower_msgs.msg import ControlCommand
-
-# Binary dependencies must be available in the same directory or Python path
-from .FoxPi_write import FoxPiWriteDID
-from .FoxPi_read import FoxPiReadDID
-from .client_config import DOIP_SERVER_IP, DoIP_LOGICAL_ADDRESS
-from .common import get_uds_client
-
-from doipclient import DoIPClient
-from doipclient.connectors import DoIPClientUDSConnector
-from udsoncan.client import Client
+from fs_msgs.msg import ControlCommand
 
 class VehicleInterfaceNode(Node):
     def __init__(self):
@@ -21,6 +11,9 @@ class VehicleInterfaceNode(Node):
         # Parameters
         self.declare_parameter('target_speed_kph', 1.0)
         self.target_speed = self.get_parameter('target_speed_kph').value
+
+        self.declare_parameter('dry_run', False)
+        self.dry_run = self.get_parameter('dry_run').value
         
         # Constants
         self.PARK_SHIFT_VALUE = 2
@@ -37,64 +30,79 @@ class VehicleInterfaceNode(Node):
         self.lamp_blink_state = 1
         
         # Initialize DoIP/UDS Connection
-        self.get_logger().info(f"Connecting to vehicle at {DOIP_SERVER_IP}...")
-        try:
-            self.doip_client = DoIPClient(DOIP_SERVER_IP, DoIP_LOGICAL_ADDRESS, protocol_version=3)
-            self.uds_connection = DoIPClientUDSConnector(self.doip_client)
-            
-            # Use a context manager-like approach or manual open/close
-            # We'll keep the client open for the life of the node
-            self.uds_client = Client(self.uds_connection, request_timeout=4, config=get_uds_client())
-            self.uds_client.open()
-            
-            self.fox_write = FoxPiWriteDID(self.uds_client)
-            self.fox_read = FoxPiReadDID(self.uds_client)
-            
-            # --- 5-Step Reset Sequence ---
-            self.get_logger().info("Executing Reset Sequence...")
-            self.fox_write.FoxPi_Reset_Sequence()
-            time.sleep(1.0)
-            
-            # --- Enable APS Drive Mode ---
-            self.get_logger().info("Enabling APS Drive Mode...")
-            # index 10: APS_flg=1, 11: APSSta=2 (Active), 12: Shift=Drive
-            self.driving_ctrl_values[10] = 1
-            self.driving_ctrl_values[11] = 2
-            self.driving_ctrl_values[12] = self.DRIVE_SHIFT_VALUE
-            self.driving_ctrl_values[13] = 0 # Initial speed 0
-            self.fox_write.FoxPi_Driving_Ctrl(self.driving_ctrl_values)
-            time.sleep(1.0)
-            
-            # --- Initial Steering Handshake ---
-            self.get_logger().info("Performing Steering Activation Handshake...")
-            # Step A: Valid=1, Req=0, Angle=0
-            self.driving_ctrl_values[4] = 1
-            self.driving_ctrl_values[5] = 0
-            self.driving_ctrl_values[6] = 0
-            self.fox_write.FoxPi_Driving_Ctrl(self.driving_ctrl_values)
-            time.sleep(0.2)
-            
-            # Step B: Valid=1, Req=1, Angle=0
-            self.driving_ctrl_values[5] = 1
-            self.fox_write.FoxPi_Driving_Ctrl(self.driving_ctrl_values)
-            time.sleep(0.2)
-            
+        if self.dry_run:
+            self.get_logger().info("\033[93mDRY RUN MODE ENABLED. No physical vehicle connection will be established.\033[0m")
             self.steering_activated = True
-            
-            # --- Initialize Lamps (Steady ON Hazard after ARMING) ---
-            self.lamp_values[0] = 1  # Position_Lamp_Enable
-            self.lamp_values[1] = 1  # Position Lamp
-            self.lamp_values[10] = 1 # Left TurnLamp Enable
-            self.lamp_values[11] = 1 # Left TurnLamp
-            self.lamp_values[12] = 1 # Right TurnLamp Enable
-            self.lamp_values[13] = 1 # Right TurnLamp
-            self.fox_write.FoxPi_Lamp_Ctrl(self.lamp_values)
-            
-            self.get_logger().info("Vehicle Interface initialized and ARMED.")
-            
-        except Exception as e:
-            self.get_logger().error(f"Failed to connect to vehicle: {e}")
-            raise e
+            self.get_logger().info("Vehicle Interface initialized in DRY RUN mode (ARMED).")
+        else:
+            # Late imports to avoid dependency errors in dry run
+            from .FoxPi_write import FoxPiWriteDID
+            from .FoxPi_read import FoxPiReadDID
+            from .client_config import DOIP_SERVER_IP, DoIP_LOGICAL_ADDRESS
+            from .common import get_uds_client
+
+            from doipclient import DoIPClient
+            from doipclient.connectors import DoIPClientUDSConnector
+            from udsoncan.client import Client
+
+            self.get_logger().info(f"Connecting to vehicle at {DOIP_SERVER_IP}...")
+            try:
+                self.doip_client = DoIPClient(DOIP_SERVER_IP, DoIP_LOGICAL_ADDRESS, protocol_version=3)
+                self.uds_connection = DoIPClientUDSConnector(self.doip_client)
+                
+                # Use a context manager-like approach or manual open/close
+                # We'll keep the client open for the life of the node
+                self.uds_client = Client(self.uds_connection, request_timeout=4, config=get_uds_client())
+                self.uds_client.open()
+                
+                self.fox_write = FoxPiWriteDID(self.uds_client)
+                self.fox_read = FoxPiReadDID(self.uds_client)
+                
+                # --- 5-Step Reset Sequence ---
+                self.get_logger().info("Executing Reset Sequence...")
+                self.fox_write.FoxPi_Reset_Sequence()
+                time.sleep(1.0)
+                
+                # --- Enable APS Drive Mode ---
+                self.get_logger().info("Enabling APS Drive Mode...")
+                # index 10: APS_flg=1, 11: APSSta=2 (Active), 12: Shift=Drive
+                self.driving_ctrl_values[10] = 1
+                self.driving_ctrl_values[11] = 2
+                self.driving_ctrl_values[12] = self.DRIVE_SHIFT_VALUE
+                self.driving_ctrl_values[13] = 0 # Initial speed 0
+                self.fox_write.FoxPi_Driving_Ctrl(self.driving_ctrl_values)
+                time.sleep(1.0)
+                
+                # --- Initial Steering Handshake ---
+                self.get_logger().info("Performing Steering Activation Handshake...")
+                # Step A: Valid=1, Req=0, Angle=0
+                self.driving_ctrl_values[4] = 1
+                self.driving_ctrl_values[5] = 0
+                self.driving_ctrl_values[6] = 0
+                self.fox_write.FoxPi_Driving_Ctrl(self.driving_ctrl_values)
+                time.sleep(0.2)
+                
+                # Step B: Valid=1, Req=1, Angle=0
+                self.driving_ctrl_values[5] = 1
+                self.fox_write.FoxPi_Driving_Ctrl(self.driving_ctrl_values)
+                time.sleep(0.2)
+                
+                self.steering_activated = True
+                
+                # --- Initialize Lamps (Steady ON Hazard after ARMING) ---
+                self.lamp_values[0] = 1  # Position_Lamp_Enable
+                self.lamp_values[1] = 1  # Position Lamp
+                self.lamp_values[10] = 1 # Left TurnLamp Enable
+                self.lamp_values[11] = 1 # Left TurnLamp
+                self.lamp_values[12] = 1 # Right TurnLamp Enable
+                self.lamp_values[13] = 1 # Right TurnLamp
+                self.fox_write.FoxPi_Lamp_Ctrl(self.lamp_values)
+                
+                self.get_logger().info("Vehicle Interface initialized and ARMED.")
+                
+            except Exception as e:
+                self.get_logger().error(f"Failed to connect to vehicle: {e}")
+                raise e
 
         # Subscribers
         self.control_sub = self.create_subscription(
@@ -130,12 +138,27 @@ class VehicleInterfaceNode(Node):
                 self.lamp_values[11] = 1
                 self.lamp_values[13] = 1
             
-            self.fox_write.FoxPi_Lamp_Ctrl(self.lamp_values)
+            if not self.dry_run:
+                self.fox_write.FoxPi_Lamp_Ctrl(self.lamp_values)
         except Exception as e:
             self.get_logger().warn(f"Failed to write lamp status: {e}")
 
     def status_callback(self):
         try:
+            if self.dry_run:
+                # Mock speed toggle logic for dry run: always allow movement
+                trip_state = 0 
+                # (Optional) You could simulate a toggle here, but usually dry run is for control verification
+                self.current_target_speed = self.target_speed
+
+                self.get_logger().info(
+                    f"[DRY RUN] STATUS: Spd: 0.0 | "
+                    f"SAS: {self.current_sas_angle:.1f} deg | "
+                    f"Target: {self.current_target_speed:.1f} | "
+                    f"Trip_Button: {trip_state}"
+                )
+                return
+
             # Read SAS Angle (DID 0x1005)
             eps_status = self.fox_read.FoxPi_EPS_Status()
             if eps_status['SAS_Angle'] != "FF":
@@ -202,13 +225,20 @@ class VehicleInterfaceNode(Node):
         self.driving_ctrl_values[12] = self.DRIVE_SHIFT_VALUE
         
         # 4. Write to Vehicle
-        try:
-            self.fox_write.FoxPi_Driving_Ctrl(self.driving_ctrl_values)
-        except Exception as e:
-            self.get_logger().error(f"Failed to send control command: {e}")
+        if self.dry_run:
+            self.get_logger().info(f"\033[92m[DRY RUN] DRIVE COMMAND: Steering={target_wheel_angle:.1f} deg, Speed={self.current_target_speed:.1f} km/h\033[0m")
+        else:
+            try:
+                self.fox_write.FoxPi_Driving_Ctrl(self.driving_ctrl_values)
+            except Exception as e:
+                self.get_logger().error(f"Failed to send control command: {e}")
 
     def shutdown_handler(self):
         self.get_logger().info("Shutdown triggered. Safely stopping vehicle...")
+        if self.dry_run:
+            self.get_logger().info("[DRY RUN] Vehicle Interface safely shut down.")
+            return
+
         try:
             # 1. Set speed to 0
             self.driving_ctrl_values[13] = 0

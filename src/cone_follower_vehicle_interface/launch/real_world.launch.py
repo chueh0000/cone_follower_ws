@@ -13,6 +13,7 @@ def generate_launch_description():
     use_rviz = LaunchConfiguration('use_rviz')
     odom_topic = LaunchConfiguration('odom_topic')
     use_perception = LaunchConfiguration('use_perception')
+    dry_run = LaunchConfiguration('dry_run')
 
     rviz_config_path = os.path.join(pkg_simulation, 'rviz', 'zed_perception.rviz')
 
@@ -31,6 +32,11 @@ def generate_launch_description():
             'use_perception',
             default_value='true',
             description='Launch ZED YOLO perception node if true'
+        ),
+        DeclareLaunchArgument(
+            'dry_run',
+            default_value='false',
+            description='If true, vehicle interface will only print commands without connecting to hardware'
         ),
 
         # 1. Perception: ZED YOLO TF Node
@@ -66,6 +72,7 @@ def generate_launch_description():
             executable='vehicle_interface_node',
             name='vehicle_interface_node',
             output='screen',
+            parameters=[{'dry_run': dry_run}]
         ),
 
         # 5. Visualization: Marker Publisher

@@ -109,5 +109,5 @@ launch-zed:
     {{ros_env}} ros2 launch cone_follower_perception zed_perception.launch.py
 
 # Launch real-world vehicle stack
-launch-real-world viz="true" odom="/zed/zed_node/odom" perception="true":
-    {{ros_env}} ros2 launch cone_follower_vehicle_interface real_world.launch.py use_rviz:={{viz}} odom_topic:={{odom}} use_perception:={{perception}}
+launch-real-world viz="true" odom="/zed/zed_node/odom" perception="true" dry_run="false":
+    {{ros_env}} ros2 launch cone_follower_vehicle_interface real_world.launch.py use_rviz:={{viz}} odom_topic:={{odom}} use_perception:={{perception}} dry_run:={{dry_run}}
