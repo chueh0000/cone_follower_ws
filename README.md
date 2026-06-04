@@ -80,10 +80,11 @@ graph LR
 - **What it does:** Runs the YOLO detector and spatial mapping. Visualizes localized 3D cones in RViz.
 
 ### 5. Real-World Deployment (Vehicle Integration)
-*Use this for final deployment on the physical electric SUV.*
+*Use this for final deployment on the physical electric SUV or for logic testing via Dry Run.*
 - **Handshake:** Ensure the steering wheel **Trip** button is ready (dead-man switch).
 - **Full Stack Launch:** `just launch-real-world`
-- **What it does:** Consolidates perception, planning, control, and vehicle interface into a single command. Maps ROS steering/speed commands to the SUV's ECU via DoIP/UDS. Includes mandatory safety handshakes and torque/angle limits.
+- **Dry Run (No Vehicle):** `just real_dry_run=true launch-real-world`
+- **What it does:** Consolidates perception, planning, control, and vehicle interface into a single command. Maps ROS steering/speed commands to the SUV's ECU via DoIP/UDS. Includes mandatory safety handshakes and torque/angle limits. In **Dry Run** mode, hardware communication is bypassed, allowing full stack validation on development laptops.
 
 ---
 

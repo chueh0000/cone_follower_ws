@@ -30,6 +30,7 @@ This project focuses on implementing an autonomous navigation stack for an elect
 - **Proprietary Integration:** Interfaces with the vehicle's ECU via DoIP/UDS using the `foxtronpi-pyclient` library.
 - **APS Control Strategy:** Due to hardware limitations, movement is controlled via the **APS Speed Control** mode (DID 0x1001), limited to 7 km/h.
 - **Safety Handshake:** Implements mandatory 5-step reset and 3-step steering activation sequences.
+- **Dry Run Mode:** Supports a hardware-free "dry run" mode (`real_dry_run=true`) that bypasses the ECU connection and logs commands to the console for logic verification on any machine.
 - **Operational Logic:**
     - **Speed Toggle:** Uses the physical steering wheel **Trip** button as a manual movement trigger (0/1 km/h).
     - **Steering Safety:** Maps ROS commands to raw wheel angles (±360 deg) with a **95° delta clamp** to prevent dissociation.

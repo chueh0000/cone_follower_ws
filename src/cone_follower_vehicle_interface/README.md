@@ -22,7 +22,7 @@ The package is self-contained and includes the following files from `foxtronpi-p
 - `client_config.cpython-310-x86_64-linux-gnu.so`
 - `common.cpython-310-x86_64-linux-gnu.so`
 
-*Note: The node must run on x86-64 due to these binary dependencies.*
+*Note: The node must run on x86-64 when connecting to hardware due to these binary dependencies. However, it can run on any architecture in **Dry Run** mode (see section 7).*
 
 ### 2. Node Setup & Secure Handshake
 The `vehicle_interface_node` establishes a connection following this logic:
@@ -59,7 +59,7 @@ If dissociation occurs, reset by setting `Angle_V`, `Angle_Req`, and `Angle` to 
 ### 4. Control & Lamp Logic
 
 #### Control Mapping
-Translates `cone_follower_msgs/ControlCommand` into the 14-value array (`driving_ctrl_values`) for `FoxPi_Driving_Ctrl`:
+Translates `fs_msgs/ControlCommand` into the 14-value array (`driving_ctrl_values`) for `FoxPi_Driving_Ctrl`:
 - **Speed:** Toggled between **0 km/h** and **1 km/h** via the Steering Wheel **Trip** button.
   - *Dead-man switch:* Node starts at 0 km/h. First press of Trip button enables 1 km/h movement.
 - **Steering:** Map normalized ROS steering (`-1.0` to `1.0`) to wheel angle (`-360.0` to `+360.0`).
@@ -84,11 +84,23 @@ A shutdown handler ensures the vehicle stops safely:
 2. Shift to Park (`APSShiftPosnReq=2`).
 3. Disable APS control flags.
 4. Set `Ctrl_Enable_Switch` to `0`.
-5. **Turn OFF all lamps.**
+5. Turn OFF all lamps.
+
+### 7. Dry Run Mode
+For logic validation without a physical vehicle or x86-64 environment:
+- **Command:** `just real_dry_run=true launch-real-world`
+- **Behavior:**
+    - Skips DoIP/UDS connection and hardware reset sequence.
+    - Sets `steering_activated = True` immediately.
+    - Mocks status monitoring (SAS Angle, Speed, etc.).
+    - Logs target steering and speed to the console instead of writing to CAN.
+    - Uses lazy imports to avoid crashes on machines without the proprietary `.so` libraries.
 
 ## Verification Tasks
 - [x] Successfully build with binary dependencies.
 - [x] Confirm "Armed" status via console logs.
+- [x] Verify Dry Run mode works without hardware connection.
 - [x] Verify Trip button toggles target speed.
 - [x] Verify turn lamps blink when moving and are steady when idle.
 - [x] Test graceful shutdown sequence (shifting to Park and clearing lamps).
+
