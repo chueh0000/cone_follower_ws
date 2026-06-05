@@ -46,6 +46,9 @@ graph LR
 | :---: | :---: |
 | ![Luxgen n7](docs/images/luxgen_n7.png) | ![FSDS Simulator](docs/images/fsds_simulator.png) |
 
+### Demo Videos
+- **Simulator Driving (Ground Truth Cones):** [YouTube](https://youtu.be/IipHGM0J3D0?si=R8dTyqCfrm4ses3f) | [Google Drive](https://drive.google.com/file/d/1FfGchQ7Cq-Om5PTYDIYxig15oGlC0ZDh/view?usp=sharing)
+
 ### Hardware & Deployment
 - **Development Environment:** Ubuntu Workstation with GPU (Remote).
 - **Deployment Platform:** Ubuntu Laptop + ROS 2 + GPU (mounted on the vehicle).
