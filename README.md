@@ -67,3 +67,4 @@ For more detailed information, please refer to the following documents:
 - **[Usage Guide](docs/USAGE.md):** Detailed instructions on how to run the system in different use cases (simulation, mock track, real-world).
 - **[Development Roadmap](docs/ROADMAP.md):** The 7-week project timeline and progress.
 - **[Prerequisites & Setup](docs/PREREQUISITES.md):** System requirements and workspace initialization instructions.
+- **[Vehicle Actuation](https://chueh0000.github.io/FoxtronPi-Manual/):** Proprietary Python package for low-level vehicle control provided by [Foxtron](https://www.foxtronev.com/).
