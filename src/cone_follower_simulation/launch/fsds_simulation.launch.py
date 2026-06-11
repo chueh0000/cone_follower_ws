@@ -2,6 +2,7 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
+from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
@@ -33,11 +34,22 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(bridge_launch_path)
         ),
-        # Unified Perception Node
+        # Unified Perception Node (Live Camera)
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(perception_launch_path)
+            PythonLaunchDescriptionSource(perception_launch_path),
+            condition=IfCondition(use_camera_viz)
         ),
-        # Removed FSDS Track Bridge to allow live perception to be the sole publisher to /cones
+        # FSDS Track Bridge (Ground Truth Simulator Map)
+        Node(
+            package='cone_follower_simulation',
+            executable='fsds_track_bridge',
+            name='fsds_track_bridge',
+            output='screen',
+            remappings=[
+                ('/testing_only/track', '/fsds/testing_only/track')
+            ],
+            condition=UnlessCondition(use_camera_viz)
+        ),
         # Centerline Generator
         Node(
             package='cone_follower_planning',
