@@ -1,7 +1,12 @@
+import os
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
 def generate_launch_description():
+    pkg_share = get_package_share_directory('cone_follower_perception')
+    yolo_model_path = os.path.join(pkg_share, 'weights', 'yolov8n_fsoco.pt')
+    
     return LaunchDescription([
         Node(
             package='cone_follower_perception',
@@ -9,9 +14,9 @@ def generate_launch_description():
             name='unified_perception_node',
             output='screen',
             parameters=[
-                {'target_frame': 'base_link'},
+                {'target_frame': 'base_link'}, # ZED vehicle frame
                 {'confidence_threshold': 0.5},
-                {'yolo_model_path': '/home/b10902076/cone_follower_ws/runs/detect/fsoco_model/weights/best.pt'},
+                {'yolo_model_path': yolo_model_path},
             ],
             remappings=[
                 ('/camera/rgb/image_rect_color', '/zed/zed_node/rgb/image_rect_color'),

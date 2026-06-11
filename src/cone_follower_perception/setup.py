@@ -12,6 +12,9 @@ setup(
             'launch/simulation.launch.py',
             'launch/hardware.launch.py'
         ]),
+        ('share/' + package_name + '/weights', [
+            'weights/yolov8n_fsoco.pt'
+        ]),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
