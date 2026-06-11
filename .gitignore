@@ -11,12 +11,15 @@ COLCON_IGNORE
 *.db3
 *.yaml.ros2
 
-# YOLO / ML Weights
+# YOLO / ML Weights & Data
 *.pt
 *.pth
 *.onnx
 *.engine
 *.trt
+runs/
+dataset/
+*.zip
 
 # Python
 __pycache__/

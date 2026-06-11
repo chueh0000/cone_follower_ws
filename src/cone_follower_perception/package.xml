@@ -13,5 +13,10 @@
   <depend>cone_follower_msgs</depend>
   <depend>python3-numpy</depend>
   <depend>python3-opencv</depend>
+  <depend>tf2_ros</depend>
+  <depend>message_filters</depend>
+  
+  <test_depend>python3-pytest</test_depend>
+
   <export><build_type>ament_python</build_type></export>
 </package>

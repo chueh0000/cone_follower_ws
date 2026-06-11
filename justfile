@@ -50,7 +50,7 @@ download-fsds:
 
 # Build the workspace
 build:
-    colcon build --symlink-install
+    python3 $(which colcon) build --symlink-install
     @touch .envrc # Forces direnv to reload the new install space
 
 # Clean the workspace

@@ -7,7 +7,11 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        ('share/' + package_name + '/launch', ['launch/zed_perception.launch.py']),
+        ('share/' + package_name + '/launch', [
+            'launch/zed_perception.launch.py',
+            'launch/simulation.launch.py',
+            'launch/hardware.launch.py'
+        ]),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -18,7 +22,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'zed_yolo_tf_node = cone_follower_perception.zed_yolo_tf_node:main'
+            'zed_yolo_tf_node = cone_follower_perception.zed_yolo_tf_node:main',
+            'unified_perception_node = cone_follower_perception.unified_perception_node:main'
         ],
     },
 )

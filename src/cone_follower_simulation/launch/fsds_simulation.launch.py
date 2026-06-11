@@ -11,6 +11,9 @@ def generate_launch_description():
     bridge_share = get_package_share_directory('fsds_ros2_bridge')
 
     bridge_launch_path = os.path.join(bridge_share, 'launch', 'fsds_ros2_bridge.launch.py')
+    
+    perception_share = get_package_share_directory('cone_follower_perception')
+    perception_launch_path = os.path.join(perception_share, 'launch', 'simulation.launch.py')
 
     use_camera_viz = LaunchConfiguration('use_camera_viz')
 
@@ -30,16 +33,11 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(bridge_launch_path)
         ),
-        # FSDS Track Bridge (Simulator -> ROS format)
-        Node(
-            package='cone_follower_simulation',
-            executable='fsds_track_bridge',
-            name='fsds_track_bridge',
-            output='screen',
-            remappings=[
-                ('/testing_only/track', '/fsds/testing_only/track')
-            ]
+        # Unified Perception Node
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(perception_launch_path)
         ),
+        # Removed FSDS Track Bridge to allow live perception to be the sole publisher to /cones
         # Centerline Generator
         Node(
             package='cone_follower_planning',
