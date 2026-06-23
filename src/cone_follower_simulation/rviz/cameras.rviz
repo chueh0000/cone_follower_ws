@@ -31,6 +31,23 @@ Visualization Manager:
       Topic:
         Value: /cone_markers
       Value: true
+    - Class: rviz_default_plugins/Path
+      Color: 255; 0; 0
+      Enabled: true
+      Line Style: Lines
+      Line Width: 0.1
+      Name: Centerline
+      Topic:
+        Durability Policy: Transient Local
+        Reliability Policy: Reliable
+        Value: /centerline
+      Value: true
+    - Class: rviz_default_plugins/Marker
+      Enabled: true
+      Name: Lookahead Point
+      Topic:
+        Value: /lookahead_marker
+      Value: true
     - Class: rviz_default_plugins/Image
       Enabled: true
       Name: Cam1
