@@ -22,6 +22,22 @@ def generate_launch_description():
                 ('/camera/rgb/image_rect_color', '/fsds/cam1/image_color'),
                 ('/camera/depth/depth_registered', '/fsds/depth_cam/image_color'),
                 ('/camera/rgb/camera_info', '/fsds/cam1/camera_info'),
+                ('/cones', '/perception/cones'),
+            ]
+        ),
+        Node(
+            package='cone_follower_perception',
+            executable='local_map_node',
+            name='local_map_node',
+            output='screen',
+            parameters=[
+                {'vehicle_frame': 'fsds/FSCar'},
+                {'global_frame': 'fsds/map'},
+                {'merge_distance': 0.5},
+                {'prune_distance_behind': 15.0},
+            ],
+            remappings=[
+                ('/odom', '/fsds/testing_only/odom')
             ]
         )
     ])

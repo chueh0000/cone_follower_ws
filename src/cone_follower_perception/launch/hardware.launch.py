@@ -22,6 +22,22 @@ def generate_launch_description():
                 ('/camera/rgb/image_rect_color', '/zed/zed_node/rgb/image_rect_color'),
                 ('/camera/depth/depth_registered', '/zed/zed_node/depth/depth_registered'),
                 ('/camera/rgb/camera_info', '/zed/zed_node/rgb/camera_info'),
+                ('/cones', '/perception/cones'),
+            ]
+        ),
+        Node(
+            package='cone_follower_perception',
+            executable='local_map_node',
+            name='local_map_node',
+            output='screen',
+            parameters=[
+                {'vehicle_frame': 'base_link'},
+                {'global_frame': 'odom'},
+                {'merge_distance': 0.5},
+                {'prune_distance_behind': 15.0},
+            ],
+            remappings=[
+                ('/odom', '/zed/zed_node/odom')
             ]
         )
     ])

@@ -26,7 +26,8 @@ setup(
     entry_points={
         'console_scripts': [
             'zed_yolo_tf_node = cone_follower_perception.zed_yolo_tf_node:main',
-            'unified_perception_node = cone_follower_perception.unified_perception_node:main'
+            'unified_perception_node = cone_follower_perception.unified_perception_node:main',
+            'local_map_node = cone_follower_perception.local_map_node:main',
         ],
     },
 )
