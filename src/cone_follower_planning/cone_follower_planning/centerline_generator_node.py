@@ -90,7 +90,7 @@ class CenterlineGeneratorNode(Node):
                (colors[p1_idx] == 'yellow' and colors[p2_idx] == 'blue'):
                 p1, p2 = points[p1_idx], points[p2_idx]
                 dist = np.linalg.norm(p1 - p2)
-                if 1.0 <= dist <= 15.0:
+                if 1.0 <= dist <= 5.0:
                     midpoints.append((p1 + p2) / 2.0)
         
         if not midpoints: return
